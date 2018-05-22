@@ -22,10 +22,8 @@ server {
 	# Read up on ssl_ciphers to ensure a secure configuration.
 	# See: https://bugs.debian.org/765782
 
-	index index.html index.php index.htm index.nginx-debian.html;
-
 	server_name ec2-184-72-122-13.compute-1.amazonaws.com 184.72.122.13;
-	index index.php index.html index.htm;
+	index index.php index.html index.htm index.nginx-debian.html;
 	root /var/www/html;
 
 	location / {
