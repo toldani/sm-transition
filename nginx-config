@@ -1,0 +1,101 @@
+##
+# You should look at the following URL's in order to grasp a solid understanding
+# of Nginx configuration files in order to fully unleash the power of Nginx.
+# http://wiki.nginx.org/Pitfalls
+# http://wiki.nginx.org/QuickStart
+# http://wiki.nginx.org/Configuration
+#
+# ScienceMadness phpBB nginx site-specific configuration
+#
+server {
+	listen 80 default_server;
+	listen [::]:80 default_server;
+
+	# SSL configuration
+	#
+	# listen 443 ssl default_server;
+	# listen [::]:443 ssl default_server;
+	#
+	# Note: You should disable gzip for SSL traffic.
+	# See: https://bugs.debian.org/773332
+	#
+	# Read up on ssl_ciphers to ensure a secure configuration.
+	# See: https://bugs.debian.org/765782
+
+	index index.html index.php index.htm index.nginx-debian.html;
+
+	server_name ec2-184-72-122-13.compute-1.amazonaws.com 184.72.122.13;
+	index index.php index.html index.htm;
+	root /var/www/html;
+
+	location / {
+		# First attempt to serve request as file, then
+		# as directory, then fall back to displaying a 404.
+		try_files $uri $uri/ =404;
+	}
+
+    # phpBB forum directory; a URL here implies it's part of phpBB
+
+	location = /talk {
+            try_files $uri $uri/ @rewriteapp;
+	}
+	
+        location @rewriteapp {
+            rewrite ^(.*)$ /talk/app.php/$1 last;
+        }
+
+        # Deny access to internal phpbb files.
+        location ~ /(config\.php|common\.php|cache|files|images/avatars/upload|includes|(?<!ext/)phpbb|store|vendor) {
+            deny all;
+            # deny was ignored before 0.8.40 for connections over IPv6.
+            # Use internal directive to prohibit access on older versions.
+            internal;
+        }
+
+        # Pass the php scripts to fastcgi server specified in upstream declaration.
+        location ~ \.php(/|$) {
+            # Unmodified fastcgi_params from nginx distribution.
+            include fastcgi_params;
+            # Necessary for php.
+            fastcgi_split_path_info ^(.+\.php)(/.*)$;
+            fastcgi_param PATH_INFO $fastcgi_path_info;
+            fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+            fastcgi_param DOCUMENT_ROOT $realpath_root;
+            try_files $uri $uri/ /talk/app.php$is_args$args;
+            fastcgi_pass php;
+        }
+
+        # Correctly pass scripts for installer
+        location /talk/install/ {
+            # phpBB uses index.htm
+            try_files $uri $uri/ @rewrite_installapp;
+
+            # Pass the php scripts to fastcgi server specified in upstream declaration.
+            location ~ \.php(/|$) {
+                # Unmodified fastcgi_params from nginx distribution.
+                include fastcgi_params;
+                # Necessary for php.
+                fastcgi_split_path_info ^(.+\.php)(/.*)$;
+                fastcgi_param PATH_INFO $fastcgi_path_info;
+                fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+                fastcgi_param DOCUMENT_ROOT $realpath_root;
+                try_files $uri $uri/ /talk/install/app.php$is_args$args;
+                fastcgi_pass php;
+            }
+        }
+
+        location @rewrite_installapp {
+            rewrite ^(.*)$ /talk/install/app.php/$1 last;
+        }
+
+        # Deny access to version control system directories.
+        location ~ /\.svn|/\.git {
+            deny all;
+            internal;
+        }
+    }
+
+    # If running php as fastcgi, specify php upstream.
+    upstream php {
+        server unix:/var/run/php/php7.0-fpm.sock;
+    }
