@@ -11,7 +11,7 @@ class PHPBBTable
 	end
 
 	def find_by(column, value)
-		value = "'#{value}'" if value.is_a?(String)
-		PHPBB_DB.query("SELECT * FROM #{@table_name} WHERE #{column} = #{value} LIMIT 1").first.to_h
+		#value = "'#{value}'" if value.is_a?(String)
+		PHPBB_DB.query("SELECT * FROM #{@table_name} WHERE #{column} = '#{value}' LIMIT 1").first.to_h
 	end
 end
