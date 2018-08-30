@@ -11,6 +11,6 @@ class XMBTable
 	end
 
 	def find_by(column, value)
-		XMB_DB.query("SELECT * FROM #{@table_name} WHERE #{column} = #{value} LIMIT 1").first.to_h
+		XMB_DB.query("SELECT * FROM #{@table_name} WHERE #{column} = '#{value}' LIMIT 1").first.to_h
 	end
 end
