@@ -4,7 +4,7 @@ require 'mysql2'
 require 'fileutils'
 require 'cgi'
 
-ATTACH_DIR = "/home/tom/Downloads/attachments"
+ATTACH_DIR = "/mnt/vmdisk/attachments"
 
 # This script connects to the MySQL XMB database, then downloads and saves each attachment locally, uses CGI::escape to sanitize the
 # filename, updates the filename in the DB to the sanitized version, and sets the attachment data to NULL
@@ -34,8 +34,8 @@ aid_max = @client.query(aid_query).first["AUTO_INCREMENT"]
 		# write the data extracted from the attachment blob field to a folder
 		bytes = File.write(attachment_path, result["attachment"])
 		puts "#{bytes} bytes written to #{attachment_path}"
-		# When you're sure you have it working properly, delete all the extracted files, uncomment the following line, and 
-		# run it again. Or just query the DB with "UPDATE xmb_attachments SET attachment = NULL"
+		# The following line would have deleted attachments as it converted them into files:
 		# @client.query("UPDATE xmb_attachments SET attachment = NULL, filename = '#{filename}' WHERE aid = #{result['aid']}")
+		# However, it's easier to just go back into MySQL and run ALTER TABLE xmb_attachments DROP COLUMN attachments;
 	end
 end
