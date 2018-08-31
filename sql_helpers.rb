@@ -67,7 +67,7 @@ end
 
 # write a row to the specified table
 def insert_phpbb_row(table, h)
-	h.delete_if {|k,v| v.nil? || v == ""}
+	h.delete_if {|k,v| v.nil?}
 	vstring = h.values.map {|g| sql_clean(g)} * ', '
 	q = "INSERT INTO #{table} (#{h.keys * ', '}) VALUES (#{vstring})"
 	puts q
@@ -79,7 +79,7 @@ def convert_xmb_user(u,debug=false)
 	if u.is_a?(Integer)
 		u = XMB_USERS[u]
 	end
-	
+
 	user = {"username_clean" => u['username'].downcase, "user_email_hash" => email_hash(u['email']), "user_permissions" => ""}
 	USERS_MAP.each_pair {|k,v| user[v] = u[k]}
 	
