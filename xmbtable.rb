@@ -13,4 +13,8 @@ class XMBTable
 	def find_by(column, value)
 		XMB_DB.query("SELECT * FROM #{@table_name} WHERE #{column} = '#{value}' LIMIT 1").first.to_h
 	end
+
+	def max(column=@pkey)
+		PHPBB_DB.query("SELECT MAX(#{column}) FROM #{@table_name}").first.values[-1]
+	end
 end

@@ -79,17 +79,14 @@ def convert_xmb_user(u,debug=false)
 	if u.is_a?(Integer)
 		u = XMB_USERS[u]
 	end
-	user = {}
-	pfd = {}
-
+	
+	user = {"username_clean" => u['username'].downcase, "user_email_hash" => email_hash(u['email']), "user_permissions" => ""}
 	USERS_MAP.each_pair {|k,v| user[v] = u[k]}
 	
 	if user['username'].to_s == ""
 		puts "User ##{user['user_id']} is null. Aborting.\n"
 	else
-		user['username_clean'] = user['username'].downcase
-		user['user_email_hash'] = email_hash(user['email'])
-
+		pfd = {}
 		PROFILE_FIELDS_DATA_MAP.each_pair {|k,v| pfd[v] = u[k]}
 
 		if debug
