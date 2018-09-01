@@ -1,6 +1,6 @@
 # Define class that looks up data in the XMB table
 
-class PHPBBTable
+class PTable
 	# creates reader methods for these instance variables
 	attr_reader :table_name, :pkey, :columns
 

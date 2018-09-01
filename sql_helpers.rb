@@ -11,8 +11,9 @@ require 'cgi' # Misc. network functions
 
 # The following maps the XMB member fields to their corresponding fields in sm_users. Note that this only contains the
 # fields that can be moved with no changes necessary.
-USERS_MAP = {"uid" => "user_id", "username" => "username", "regip" => "user_ip", "regdate" => "user_regdate", "lastvisit" => "user_lastvisit",
-		"email" => "user_email", "password" => "user_password", "postnum" => "user_posts", "sig" => "user_sig" }
+USERS_MAP = {"uid" => "user_id", "username" => "username", "regip" => "user_ip", "regdate" => "user_regdate",
+	"lastvisit" => "user_lastvisit", "email" => "user_email", "password" => "user_password", "postnum" => "user_posts",
+	"sig" => "user_sig", "bday" => "user_birthday" }
 
 # The following maps the XMB fields to their corresponding fileds in sm_profile_fields_data
 PROFILE_FIELDS_DATA_MAP = {"uid" => "user_id", "location" => "pf_phpbb_location", "site" => "pf_phpbb_website", "mood" => "pf_mood", "bio" => "pf_bio"}
@@ -28,17 +29,25 @@ require './xmbtable.rb'
 PHPBB_DB = Mysql2::Client.new(host: "127.0.0.1", username: "sm", password: "science", port: 3306, database: "sm_phpbb")
 require './phpbbtable.rb'
 
-XMB_USERS = XMBTable.new('xmb_members')
-XMB_POSTS = XMBTable.new('xmb_posts')
+# Defining some objects to help interface with the XMB tables
+X_MEMBERS = XTable.new('xmb_members')
+X_THREADS = XTable.new('xmb_threads')
+X_POSTS = XTable.new('xmb_posts')
 
-# get a list of column names for a table in either database
-def get_columns(t)
-	if t.match?(/^xmb_/)
-		return XMB_DB.query("DESCRIBE #{t}").map {|h| h['Field']}
-	else
-		return PHPBB_DB_DB.query("DESCRIBE #{t}").map {|h| h['Field']}
-	end
-end
+# Defining some objects to help interface with the phpBB tables
+P_USERS = PTable.new('sm_users')
+P_PFD = PTable.new('sm_profile_fields_data')
+P_TOPICS = PTable.new('sm_topics')
+P_POSTS = PTable.new('sm_posts')
+
+# # get a list of column names for a table in either database
+# def get_columns(t)
+# 	if t.match?(/^xmb_/)
+# 		return XMB_DB.query("DESCRIBE #{t}").map {|h| h['Field']}
+# 	else
+# 		return PHPBB_DB.query("DESCRIBE #{t}").map {|h| h['Field']}
+# 	end
+# end
 
 # generates the email hash that's stored in the phpbb users table
 def email_hash(email)
@@ -50,8 +59,8 @@ end
 def rquote_fix(post)
   str = post.gsub(RQUOTE_RX) do |m|
   	pid, tid, username = RQUOTE_RX.match(m).captures
-  	post_time = XMB_POSTS[pid]['dateline']
-  	uid = XMB_USERS.find_by('username', username)['uid']
+  	post_time = X_POSTS[pid]['dateline']
+  	uid = X_MEMBERS.find_by('username', username)['uid']
   	"[quote=#{username} post_id=#{pid} time=#{post_time} user_id=#{uid}]"
   end
   str.gsub("[/rquote]", "[/quote]")
@@ -77,7 +86,7 @@ end
 # put an XMB user record into a hash that can be inserted into the corresponding phpbb table
 def convert_xmb_user(u,debug=false)
 	if u.is_a?(Integer)
-		u = XMB_USERS[u]
+		u = X_MEMBERS[u]
 	end
 
 	user = {"username_clean" => u['username'].downcase, "user_email_hash" => email_hash(u['email']), "user_permissions" => ""}
