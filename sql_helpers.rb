@@ -11,12 +11,12 @@ require 'cgi' # Misc. network functions
 
 # The following maps the XMB member fields to their corresponding fields in sm_users. Note that this only contains the
 # fields that can be moved with no changes necessary.
-USERS_MAP = Hash.new("").merge {"uid" => "user_id", "username" => "username", "regip" => "user_ip", "regdate" => "user_regdate",
+USERS_MAP = {"uid" => "user_id", "username" => "username", "regip" => "user_ip", "regdate" => "user_regdate",
 	"lastvisit" => "user_lastvisit", "email" => "user_email", "password" => "user_password", "postnum" => "user_posts",
 	"sig" => "user_sig", "bday" => "user_birthday"}
 
 # The following maps the XMB fields to their corresponding fileds in sm_profile_fields_data
-PROFILE_FIELDS_DATA_MAP = Hash.new("").merge {"uid" => "user_id", "location" => "pf_phpbb_location", "site" => "pf_phpbb_website",
+PROFILE_FIELDS_DATA_MAP = {"uid" => "user_id", "location" => "pf_phpbb_location", "site" => "pf_phpbb_website",
 	"mood" => "pf_mood", "bio" => "pf_bio"}
 
 # Regular expression for matching [rquote] bbcode tags
