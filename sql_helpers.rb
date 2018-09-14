@@ -8,107 +8,52 @@ require 'digest' # For MD5 and CRC hashing.  The gem 'digest-crc' needs to be in
 require 'mysql2' # Ruby MySQL interface gem
 require 'fileutils' # File utilities
 require 'cgi' # Misc. network functions
-
-# The following maps the XMB member fields to their corresponding fields in sm_users. Note that this only contains the
-# fields that can be moved with no changes necessary.
-USERS_MAP = {"uid" => "user_id", "username" => "username", "regip" => "user_ip", "regdate" => "user_regdate",
-	"lastvisit" => "user_lastvisit", "email" => "user_email", "password" => "user_password", "postnum" => "user_posts",
-	"sig" => "user_sig", "bday" => "user_birthday"}
-
-# The following maps the XMB fields to their corresponding fileds in sm_profile_fields_data
-PROFILE_FIELDS_DATA_MAP = {"uid" => "user_id", "location" => "pf_phpbb_location", "site" => "pf_phpbb_website",
-	"mood" => "pf_mood", "bio" => "pf_bio"}
-
-# Regular expression for matching [rquote] bbcode tags
-RQUOTE_RX = /\[rquote\=(\d+)&amp;tid=(\d+)&amp;author=(.*?)\]/
+require 'yaml' # useful for text parsing and other things
 
 # The XMB database, running in a virtual machine.  Port forwarding is set up to allow communication
 XMB_DB = Mysql2::Client.new(host: "127.0.0.1", username: "root", password: "science", port: 3333, database: "science_xmb1")
-require './xmbtable.rb'
+XMB_TABLES = XMB_DB.query("SHOW TABLES").to_a.map {|h| h.flatten[1]} # array of xmb table names
 
 # The phpBB database, running on the local non-virtual machine.
 PHPBB_DB = Mysql2::Client.new(host: "127.0.0.1", username: "sm", password: "science", port: 3306, database: "sm_phpbb")
-require './phpbbtable.rb'
+PHPBB_TABLES = PHPBB_DB.query("SHOW TABLES").to_a.map {|h| h.flatten[1]} # array of phpbb table names
 
+require './mysqltable.rb'
+
+# A hash mapping XMB forums numbers to their phpbb counterparts
+X2P_FID = {2=>5, 11=>21, 3=>12, 13=>1, 5=>7, 6=>9, 7=>18, 9=>11, 10=>6, 12=>8, 14=>3, 15=>13, 16=>4,
+				19=>19, 20=>16, 22=>15, 23=>14, 24=>10, 8=>20}
+
+@table_class = Hash.new(SQLTable)
+@table_class.merge("users" => UserTable, "members" => UserTable, "posts" => PostTable)
+
+# Automatically initialize a SQLTable object for each table in the XMB db
+XMB = XMB_TABLES.inject({}) do |h,t|
+	n = t[/(?<=xmb_).+/]
+	h.merge(n => @table_class[n])
+end
+
+# Automatically initialize a SQLTable object for each table in the PHPBB db
+PHPBB = PHPBB_TABLES.inject({}) do |h,t|
+	n = t[/(?<=sm_).+/]
+	h.merge(n => @table_class[n])
+end
+
+
+=begin
 # Defining some objects to help interface with the XMB tables
-X_MEMBERS = XTable.new('xmb_members')
-X_THREADS = XTable.new('xmb_threads')
-X_POSTS = XTable.new('xmb_posts')
+X_MEMBERS = MySQLTable.new('xmb_members')
+X_THREADS = MySQLTable.new('xmb_threads')
+X_POSTS = MySQLTable.new('xmb_posts')
+X_ATTACH = MySQLTable.new('xmb_attachments')
+X_POSTS = MySQLTable.new('xmb_posts')
 
 # Defining some objects to help interface with the phpBB tables
-P_USERS = PTable.new('sm_users')
-P_PFD = PTable.new('sm_profile_fields_data')
-P_TOPICS = PTable.new('sm_topics')
-P_POSTS = PTable.new('sm_posts')
+P_USERS = MySQLTable.new('sm_users')
+P_PFD = MySQLTable.new('sm_profile_fields_data')
+P_TOPICS = MySQLTable.new('sm_topics')
+P_POSTS = MySQLTable.new('sm_posts')
+P_ATTACH = MySQLTable.new('sm_attachments')
+=end
 
-# # get a list of column names for a table in either database
-# def get_columns(t)
-# 	if t.match?(/^xmb_/)
-# 		return XMB_DB.query("DESCRIBE #{t}").map {|h| h['Field']}
-# 	else
-# 		return PHPBB_DB.query("DESCRIBE #{t}").map {|h| h['Field']}
-# 	end
-# end
 
-# generates the email hash that's stored in the phpbb users table
-def email_hash(email)
-	return nil if email.nil? || email.empty?
-  (Digest::CRC32.checksum(email.downcase).to_s + email.length.to_s).to_i
-end
-
-# return a post with all the rquote tags fixed and replaced with phpbb quote tags
-def rquote_fix(post)
-  str = post.gsub(RQUOTE_RX) do |m|
-  	pid, tid, username = RQUOTE_RX.match(m).captures
-  	post_time = X_POSTS[pid]['dateline']
-  	uid = X_MEMBERS.find_by('username', username)['uid']
-  	"[quote=#{username} post_id=#{pid} time=#{post_time} user_id=#{uid}]"
-  end
-  str.gsub("[/rquote]", "[/quote]")
-end
-
-def sql_clean(v)
-	if v.is_a?(Numeric)
-		return v.to_s
-	elsif v.is_a?(String)
-		return "'#{XMB_DB.escape(v)}'"
-	end
-end
-
-# write a row to the specified table
-def insert_phpbb_row(table, h)
-	h.delete_if {|k,v| v.nil?}
-	vstring = h.values.map {|g| sql_clean(g)} * ', '
-	q = "INSERT INTO #{table} (#{h.keys * ', '}) VALUES (#{vstring})"
-	puts q
-	PHPBB_DB.query(q).inspect
-end
-
-# put an XMB user record into a hash that can be inserted into the corresponding phpbb table
-def convert_xmb_user(u,debug=false)
-	if u.is_a?(Integer)
-		u = X_MEMBERS[u]
-	elsif u.is_a?(String)
-		u = X_MEMBERS.find_by('username', u)
-	end
-
-	user = {"username_clean" => u['username'].downcase, "user_email_hash" => email_hash(u['email']), "user_permissions" => ""}
-	USERS_MAP.each_pair {|k,v| user[v] = u[k]}
-	
-	if user['username'].to_s == ""
-		puts "User ##{user['user_id']} is null. Aborting.\n"
-	else
-		fields = %w"interests occupation location youtube facebook skype twitter website"
-		pfd = fields.inject({}) {|h,s| h.merge("pf_phpbb_#{s}" => "")}
-		PROFILE_FIELDS_DATA_MAP.each_pair {|k,v| pfd[v] = u[k]}
-
-		if debug
-			puts user
-			puts pfd
-			return [user, pfd]
-		else
-			puts insert_phpbb_row('sm_users2', user)
-			puts insert_phpbb_row('sm_profile_fields_data', pfd)
-		end
-	end
-end
