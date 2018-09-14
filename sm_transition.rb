@@ -32,12 +32,14 @@ X2P_FID = {2=>5, 11=>21, 3=>12, 13=>1, 5=>7, 6=>9, 7=>18, 9=>11, 10=>6, 12=>8, 1
 # Automatically initialize a SQLTable object for each table in the XMB db
 XMB = XMB_TABLES.inject({}) do |h,t|
 	n = t[/(?<=xmb_).+/]
+  puts "Building XMB['#{n}'] ..."
 	h.merge(n => @table_class[n].new(t))
 end
 
 # Automatically initialize a SQLTable object for each table in the PHPBB db
 PHPBB = PHPBB_TABLES.inject({}) do |h,t|
 	n = t[/(?<=sm_).+/]
+  puts "Building PHPBB['#{n}'] ..."
 	h.merge(n => @table_class[n].new(t))
 end
 
