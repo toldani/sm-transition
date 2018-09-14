@@ -66,7 +66,7 @@ class SQLTable
 
 		z.each_pair do |t,h|
 			h.delete_if {|k,v| v.nil?}
-			vstring = h.values.map {|g| self.sanitize(g)} * ', '}
+			vstring = h.values.map {|g| self.sanitize(g) * ', '}
 			kstring = h.keys * ', '
 			q = "INSERT INTO #{t} (#{kstring}) VALUES (#{vstring})"
 			puts @db.query(q)
