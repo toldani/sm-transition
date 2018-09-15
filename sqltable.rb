@@ -110,7 +110,7 @@ class SQLTable
 		if v.is_a?(Numeric)
 			return v.to_s
 		elsif v.is_a?(String)
-			return "'#{@db.escape(v)}'"
+			return "'#{PHPBB_DB.escape(v)}'"
 		end
 	end
 
