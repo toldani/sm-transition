@@ -22,13 +22,13 @@ class UserTable < SQLTable
 	end
 
 	# put an XMB user record into a hash that can be inserted into the corresponding phpbb table
-	def import_user(u,debug=false)
+	def import_user(id,debug=false)
 		# if u.is_a?(Integer)
 		# 	u = self[u]
 		# elsif u.is_a?(String)
 		# 	u = self.find_by('username', u)
 		# end
-		u = self[u]
+		u = self[id]
 
     return nil if u.empty?
 
@@ -49,8 +49,8 @@ class UserTable < SQLTable
 			else
 				# insert_phpbb_row('sm_users2', user)
 				# insert_phpbb_row('sm_profile_fields_data', pfd)
-				puts user if user['user_id'] % 20 == 0
-				return {'sm_users2' => user, 'sm_profile_fields_data' => pfd}
+				puts [user, pfd] if user['user_id'] % 20 == 0
+				return {'sm_users' => user, 'sm_profile_fields_data' => pfd}
 			end
 		end
 	end
