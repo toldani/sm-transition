@@ -29,8 +29,10 @@ class AttachmentTable < SQLTable
 					thumbnail: thumb_exists ? 1 : 0
 				}
 
-		FileUtils.cp(path, CSPATH+md5, remove_destination: true)
-		FileUtils.cp(path+"-thumb.jpg", CSPATH+"thumb_"+md5, remove_destination: true)
+		unless File.exist?(CSPATH+md5)
+			FileUtils.cp(path, CSPATH+md5)
+			FileUtils.cp(path+"-thumb.jpg", CSPATH+"thumb_"+md5) if thumb_exists
+		end
 
 		return {@table_name => h}
 	end
