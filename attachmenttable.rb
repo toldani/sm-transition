@@ -21,7 +21,7 @@ class AttachmentTable < SQLTable
 					physical_filename: md5,
 					real_filename: x['filename'],
 					download_count: x['downloads'],
-					attach_comment: nil,
+					attach_comment: "",
 					extension: x['filename'].split('.')[-1],
 					mimetype: x['filetype'],
 					filesize: x['filesize'],
