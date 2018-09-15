@@ -30,6 +30,8 @@ class UserTable < SQLTable
 		# end
 		u = self[u]
 
+    return nil if u.empty?
+
 		user = default_row.merge("username_clean" => u['username'].downcase, "user_email_hash" => email_hash(u['email']))
 		USERS_MAP.each_pair {|k,v| user[v] = u[k]}
 		
