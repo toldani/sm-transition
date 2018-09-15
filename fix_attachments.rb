@@ -1,13 +1,22 @@
 
-require './sql_helpers.rb'
+require './sm_transition.rb'
 
-cspath = "/var/www/html/talk/files/cloudstorage/attachments/"
 hdpath = "/mnt/vmdisk/attachments/"
 
 dlist = Dir.glob(hdpath+"*")
 
 dlist.each do |p|
-  alist = Dir.glob(p+"*")
+  Dir.glob(p+"/*/*").sort.each do |f|
+  	next if f[/-thumb\.jpg$/]
+  	aid = f.split('/')[-2].to_i
+  	a = XMB.attachments.to_phpbb(aid, f)
+  	puts a
+  	SQLTable.insert_record(a)
+  end
+end
+
+
+
   
 
 =begin
