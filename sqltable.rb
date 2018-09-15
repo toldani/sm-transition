@@ -11,7 +11,7 @@ class SQLTable
 	def initialize(t)
 		@db = t.split('_')[0] == 'sm' ? PHPBB_DB : XMB_DB
 		@table_name = t
-		@pkey = @db.query("SHOW KEYS FROM #{t} WHERE Key_name = 'PRIMARY'").first['Column_name']
+		@pkey = @db.query("SHOW KEYS FROM #{t} WHERE Key_name = 'PRIMARY'").first['Column_name'] rescue nil
 		@columns = @db.query("DESCRIBE #{t}").map {|h| h['Field']}
 		@rows_written = 0
 	end
@@ -42,7 +42,11 @@ class SQLTable
 
 	# allows you to reference a row using the table's primary key
 	def [](id)
-		@db.query("SELECT * FROM #{@table_name} WHERE #{@pkey} = #{id}").first.to_h
+		if @pkey.nil?
+			nil
+		else
+			@db.query("SELECT * FROM #{@table_name} WHERE #{@pkey} = #{id}").first.to_h
+		end
 	end
 
 	# look up a value in the the specified column. does not check for duplicates.
@@ -53,6 +57,11 @@ class SQLTable
 	# get the maximum number stored in a column. default to primary key if no column is specified
 	def max(column=@pkey)
 		@db.query("SELECT MAX(#{column}) FROM #{@table_name}").first.values[-1]
+	end
+
+	# count the rows in a table
+	def count
+		@db.query("SELECT COUNT(*) FROM #{@table_name}").first.values[-1]
 	end
 
 	# write a row to the specified table. data is supplied as a hash, where key names correspond to column names
