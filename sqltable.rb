@@ -65,7 +65,14 @@ class SQLTable
 
 	# look up a value in the the specified column. does not check for duplicates.
 	def find_by(column, value)
-		@db.query("SELECT * FROM #{@table_name} WHERE #{column} = #{class.sanitize(value)} LIMIT 1").first.to_h
+		@db.query("SELECT * FROM #{@table_name} WHERE #{column} = #{SQLTable.sanitize(value)} LIMIT 1").first.to_h
+	end
+
+	# get a bunch of records that match a value of a single record (column_name: value, other_table_name: other_column_name)
+	def get_linked_records(**args)
+		ar = args.to_a
+		q = "SELECT * FROM #{ar[1].first} WHERE #{ar[1].last} = #{SQLTable.sanitize(ar[0].last)}"
+		return [find_by(*ar[0]), @db.query(q).to_a] # two-element array. first element is a record from this table, second is an array from other table
 	end
 
 	# get the maximum number stored in a column. default to primary key if no column is specified
