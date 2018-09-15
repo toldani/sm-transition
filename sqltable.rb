@@ -37,7 +37,7 @@ class SQLTable
 			ar = @db.query("DESCRIBE #{@table_name}").to_a
 			no_default = ar.select {|r| r['Null'] == "NO" && r['Default'].nil?}
 			no_default.each do |h|
-				@default_row[h['Field']] = self.guess_column_default(h['Type'])
+				@default_row[h['Field']] = self.class.guess_column_default(h['Type'])
 			end
 			puts @default_row.inspect
 		end
