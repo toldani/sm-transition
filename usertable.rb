@@ -49,7 +49,7 @@ class UserTable < SQLTable
 			else
 				# insert_phpbb_row('sm_users2', user)
 				# insert_phpbb_row('sm_profile_fields_data', pfd)
-				puts [user, pfd] if user['user_id'] % 20 == 0
+				# puts [user, pfd] if user['user_id'] % 20 == 0
 				return {'sm_users' => user, 'sm_profile_fields_data' => pfd}
 			end
 		end

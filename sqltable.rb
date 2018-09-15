@@ -95,13 +95,18 @@ class SQLTable
 			vstring = h.values.map {|g| self.sanitize(g)} * ', '
 			kstring = h.keys * ', '
 			q = "INSERT INTO #{t} (#{kstring}) VALUES (#{vstring})"
-			puts PHPBB_DB.query(q)
-			@@rows_written += 1
+			begin
+				PHPBB_DB.query(q)
+			rescue Mysql2::Error => e
+				puts e
+				next
+			end
 
-			if @@rows_written < 100 || rand(0..10) == 0 # only output 1/10 of writes to the console after the first 100 writes
+			if @@rows_written < 100 || @@rows_written % 20 == 0 # only output 1/10 of writes to the console after the first 100 writes
 				puts "Wrote \e[32m#{h}\e[0m to \e[36m#{t}\e[0m"
 			end
 		end
+		@@rows_written += 1
 	end
 
 	# class variables follow
