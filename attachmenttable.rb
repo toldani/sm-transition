@@ -30,7 +30,7 @@ class AttachmentTable < SQLTable
 				}
 
 		FileUtils.cp(path, CSPATH+md5, force: true)
-		FileUtils.cp(path+"-thumb.jpg", CSPATH+"thumb_"+md5, force: true)
+		FileUtils.cp(path+"-thumb.jpg", CSPATH+"thumb_"+md5, remove_destination: true)
 
 		return {@table_name => h}
 	end
