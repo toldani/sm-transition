@@ -2,7 +2,7 @@
 
 class AttachmentTable < SQLTable
 
-	CSPATH = "/var/www/html/talk/files/cloudstorage/attachments/"
+	CSPATH = "/var/www/html/talk/files/attachments/"
 	HDPATH = "/mnt/vmdisk/attachments/"
 
 	def to_phpbb(aid, path)
