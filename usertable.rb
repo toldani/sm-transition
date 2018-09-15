@@ -22,7 +22,7 @@ class UserTable < SQLTable
 	end
 
 	# put an XMB user record into a hash that can be inserted into the corresponding phpbb table
-	def convert_xmb_user(u,debug=false)
+	def import_user(u,debug=false)
 		# if u.is_a?(Integer)
 		# 	u = self[u]
 		# elsif u.is_a?(String)

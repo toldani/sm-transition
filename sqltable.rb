@@ -3,6 +3,8 @@
 class SQLTable
 	include Enumerable
 
+	@@rows_written = 0
+
 	# creates reader methods for these instance variables
 	attr_reader :table_name, :pkey, :columns, :db
 
@@ -13,7 +15,6 @@ class SQLTable
 		@table_name = t
 		@pkey = @db.query("SHOW KEYS FROM #{t} WHERE Key_name = 'PRIMARY'").first['Column_name'] rescue nil
 		@columns = @db.query("DESCRIBE #{t}").map {|h| h['Field']}
-		@rows_written = 0
 	end
 
 	def inspect
@@ -23,11 +24,11 @@ class SQLTable
 
   def random
   	h = {}
-  	while h.empty?
+		while h.empty?
     	h = @db.query("SELECT * FROM #{@table_name} WHERE #{@pkey} = #{rand(max)}").first.to_h
-    end
+		end
     return h
-   end
+  end
 
 	# puts some default values in the initial hash that's used as a template for inserting rows
 	def default_row
@@ -64,7 +65,7 @@ class SQLTable
 
 	# look up a value in the the specified column. does not check for duplicates.
 	def find_by(column, value)
-		@db.query("SELECT * FROM #{@table_name} WHERE #{column} = #{self.sanitize(value)} LIMIT 1").first.to_h
+		@db.query("SELECT * FROM #{@table_name} WHERE #{column} = #{class.sanitize(value)} LIMIT 1").first.to_h
 	end
 
 	# get the maximum number stored in a column. default to primary key if no column is specified
@@ -78,23 +79,19 @@ class SQLTable
 	end
 
 	# write a row to the specified table. data is supplied as a hash, where key names correspond to column names
-	def insert_row(r)
+	def self.insert_record(r)
 		# if the hash keys are all valid writable table names, then write rows to multiple tables
-		if (r.keys & PHPBB_TABLES) == r.keys
-			z = r
-		else
-			z = {@table_name => r}
-		end
+		return nil if (r.keys & PHPBB_TABLES) != r.keys
 
-		z.each_pair do |t,h|
+		r.each_pair do |t,h|
 			h.delete_if {|k,v| v.nil?}
 			vstring = h.values.map {|g| self.sanitize(g) * ', '}
 			kstring = h.keys * ', '
 			q = "INSERT INTO #{t} (#{kstring}) VALUES (#{vstring})"
 			puts @db.query(q)
-			@rows_written += 1
+			@@rows_written += 1
 
-			if @rows_written < 100 || rand(0..10) == 0 # only output 1/10 of writes to the console after the first 100 writes
+			if @@rows_written < 100 || rand(0..10) == 0 # only output 1/10 of writes to the console after the first 100 writes
 				puts "Wrote \e[32m#{h}\e[0m to \e[36m#{t}\e[0m"
 			end
 		end
