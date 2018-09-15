@@ -26,7 +26,7 @@ class AttachmentTable < SQLTable
 					mimetype: x['filetype'],
 					filesize: x['filesize'],
 					filetime: x['updatetime'].to_i,
-					thumbnail: thumb_exists ? 1 : 0
+					thumbnail: (thumb_exists ? 1 : 0)
 				}
 
 		unless File.exist?(CSPATH+md5)
