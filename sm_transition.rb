@@ -21,13 +21,14 @@ PHPBB_TABLES = PHPBB_DB.query("SHOW TABLES").to_a.map {|h| h.flatten[1]} # array
 require './sqltable.rb'
 require './usertable.rb'
 require './posttable.rb'
+require './attachmenttable.rb'
 
 # A hash mapping XMB forums numbers to their phpbb counterparts
 X2P_FID = {2=>5, 11=>21, 3=>12, 13=>1, 5=>7, 6=>9, 7=>18, 9=>11, 10=>6, 12=>8, 14=>3, 15=>13, 16=>4,
 				19=>19, 20=>16, 22=>15, 23=>14, 24=>10, 8=>20}
 
 @table_class = Hash.new(SQLTable)
-@table_class.merge!("users" => UserTable, "members" => UserTable, "posts" => PostTable)
+@table_class.merge!("users" => UserTable, "members" => UserTable, "posts" => PostTable, "attachments" => AttachmentsTable)
 
 # Automatically initialize a SQLTable object for each table in the XMB db
 XMB = {}
