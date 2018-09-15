@@ -21,6 +21,14 @@ class SQLTable
 		"\n\e[92m#{@table_name}\e[0m (#{self.class}, #{count} row#{"s" if count != 1}): \n\t#{clist}\n"
 	end
 
+  def random
+  	h = {}
+  	while h.empty?
+    	h = @db.query("SELECT * FROM #{@table_name} WHERE #{@pkey} = #{rand(max)}").first.to_h
+    end
+    return h
+   end
+
 	# puts some default values in the initial hash that's used as a template for inserting rows
 	def default_row
 		if @default_row.nil?
