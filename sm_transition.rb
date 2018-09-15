@@ -28,7 +28,7 @@ X2P_FID = {2=>5, 11=>21, 3=>12, 13=>1, 5=>7, 6=>9, 7=>18, 9=>11, 10=>6, 12=>8, 1
 				19=>19, 20=>16, 22=>15, 23=>14, 24=>10, 8=>20}
 
 @table_class = Hash.new(SQLTable)
-@table_class.merge!("users" => UserTable, "members" => UserTable, "posts" => PostTable, "attachments" => AttachmentsTable)
+@table_class.merge!("users" => UserTable, "members" => UserTable, "posts" => PostTable, "attachments" => AttachmentTable)
 
 # Automatically initialize a SQLTable object for each table in the XMB db
 XMB = {}
