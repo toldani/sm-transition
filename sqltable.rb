@@ -17,8 +17,8 @@ class SQLTable
 	end
 
 	def inspect
-		clist = @columns.map {|s| @pkey == s ? "\e[1m#{s}\e[0m" : s} * ', '
-		"\e[92m#{@table_name}\e[0m (#{count} rows): #{clist}"
+		clist = @columns.map {|s| @pkey == s ? "\e[1m#{s} (PK)\e[0m" : s} * "\n\t"
+		"\e[92m#{@table_name}\e[0m (#{count} rows): \n\t#{clist}\n"
 	end
 
 	# puts some default values in the initial hash that's used as a template for inserting rows
