@@ -69,10 +69,12 @@ class SQLTable
 	end
 
 	# get a bunch of records that match a value of a single record (column_name: value, other_table_name: other_column_name)
-	def where(**args)
-		q = args.map {|k,v| "#{k} = #{SQLTable.sanitize(v)}"} * ' AND '
+	def where(*cols, **conditions)
+		q = conditions.map {|k,v| "#{k} = #{SQLTable.sanitize(v)}"} * ' AND '
+		c = (cols & @columns) * ', '
+		c = "*" if c.empty?
 		puts q
-		return @db.query("SELECT * FROM #{@table_name} WHERE #{q}").to_a
+		return @db.query("SELECT #{c} FROM #{@table_name} WHERE #{q}").to_a
 	end
 
 	# get the maximum number stored in a column. default to primary key if no column is specified
