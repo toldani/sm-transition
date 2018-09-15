@@ -30,12 +30,14 @@ X2P_FID = {2=>5, 11=>21, 3=>12, 13=>1, 5=>7, 6=>9, 7=>18, 9=>11, 10=>6, 12=>8, 1
 @table_class.merge!("users" => UserTable, "members" => UserTable, "posts" => PostTable)
 
 # Automatically initialize a SQLTable object for each table in the XMB db
-XMB = XMB_TABLES.inject({}) do |h,t|
+XMB = {}
+XMB_TABLES.each do |t|
 	n = t[/(?<=xmb_).+/]
   xt = @table_class[n].new(t)
   next if xt.count.nil?
   puts "Building XMB['#{n}'] ... #{xt.count} rows"
-	h.merge(n => xt)
+	XMB[n] = xt
+  XMB.define_singleton_method(n.to_sym) { self.fetch(n) }
 end
 
 # Automatically initialize a SQLTable object for each table in the PHPBB db
