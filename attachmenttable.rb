@@ -7,7 +7,8 @@ class AttachmentTable < SQLTable
 
 	def to_phpbb(aid, path)
 		x = self[aid]
-		thumb_exists = File.exist?(path + "-thumb.jpg")
+		thumb_path = path.sub("/#{aid}/", "/#{aid+1}/") + "-thumb.jpg"
+		i = File.exist?(thumb_path) ? 1 : 0
 		md5 = self.class.md5sum(path)
 		tid = XMB.posts[x['pid']]['tid']
 
@@ -26,12 +27,12 @@ class AttachmentTable < SQLTable
 					mimetype: x['filetype'],
 					filesize: x['filesize'],
 					filetime: x['updatetime'].to_i,
-					thumbnail: (thumb_exists ? 1 : 0)
+					thumbnail: i
 				}
 
 		unless File.exist?(CSPATH+md5)
 			FileUtils.cp(path, CSPATH+md5)
-			FileUtils.cp(path+"-thumb.jpg", CSPATH+"thumb_"+md5) if thumb_exists
+			FileUtils.cp(thumb_path, CSPATH+"thumb_"+md5) if i > 0
 		end
 
 		return {"sm_attachments" => h}
