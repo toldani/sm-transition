@@ -16,6 +16,11 @@ class SQLTable
 		@rows_written = 0
 	end
 
+	def inspect
+		clist = @columns.map {|s| @pkey == s ? "\e[1m#{s}\e[0m" : s} * ', '
+		"\e[#32m##{@table_name}\e[0m (#{count} rows): #{clist}"
+	end
+
 	# puts some default values in the initial hash that's used as a template for inserting rows
 	def default_row
 		if @default_row.nil?
