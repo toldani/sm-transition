@@ -69,10 +69,10 @@ class SQLTable
 	end
 
 	# get a bunch of records that match a value of a single record (column_name: value, other_table_name: other_column_name)
-	def get_linked_records(**args)
-		ar = args.to_a
-		q = "SELECT * FROM #{ar[1].first} WHERE #{ar[1].last} = #{SQLTable.sanitize(ar[0].last)}"
-		return [find_by(*ar[0]), @db.query(q).to_a] # two-element array. first element is a record from this table, second is an array from other table
+	def where(**args)
+		q = args.map {|k,v| "#{k} = #{SQLTable.sanitize(v)}"} * ' AND '
+		puts q
+		return @db.query("SELECT * FROM #{@table_name} WHERE #{q}").to_a
 	end
 
 	# get the maximum number stored in a column. default to primary key if no column is specified
