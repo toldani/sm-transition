@@ -34,7 +34,7 @@ class AttachmentTable < SQLTable
 			FileUtils.cp(path+"-thumb.jpg", CSPATH+"thumb_"+md5) if thumb_exists
 		end
 
-		return {@table_name => h}
+		return {"sm_attachments" => h}
 	end
 
 
