@@ -95,7 +95,7 @@ class SQLTable
 			vstring = h.values.map {|g| self.sanitize(g)} * ', '
 			kstring = h.keys * ', '
 			q = "INSERT INTO #{t} (#{kstring}) VALUES (#{vstring})"
-			puts @db.query(q)
+			puts PHPBB_DB.query(q)
 			@@rows_written += 1
 
 			if @@rows_written < 100 || rand(0..10) == 0 # only output 1/10 of writes to the console after the first 100 writes
