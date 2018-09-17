@@ -22,13 +22,14 @@ require './sqltable.rb'
 require './usertable.rb'
 require './posttable.rb'
 require './attachmenttable.rb'
+require './threadtable.rb'
 
 # calling .to_i on true or false will return 1 or 0
 class FalseClass; def to_i; 0 end end
 class TrueClass; def to_i; 1 end end
 
 @table_class = Hash.new(SQLTable)
-@table_class.merge!("users" => UserTable, "members" => UserTable, "posts" => PostTable, "attachments" => AttachmentTable)
+@table_class.merge!("users" => UserTable, "members" => UserTable, "posts" => PostTable, "attachments" => AttachmentTable, "threads" => ThreadTable)
 
 # Automatically initialize a SQLTable object for each table in the XMB db
 XMB = {}
