@@ -146,8 +146,6 @@ class SQLTable
 
 protected
 
-	def 
-
 	# check if a table is from XMB before attempting to write to it
 	#def can_write?(t=@table_name)
 	#	return PHPBB_TABLES.include?(t)
