@@ -35,7 +35,7 @@ class ThreadTable < SQLTable
     h = {
       topic_id: x['tid'],
       forum_id: X2P_FID[x['fid']],
-      icon_id: POST_ICONS[x['icon']].to_s,
+      icon_id: POST_ICONS[x['icon']],
       topic_attachment: has_attach.to_i,
       topic_reported: 0,
       topic_title: x['subject'],

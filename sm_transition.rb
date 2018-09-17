@@ -18,6 +18,14 @@ XMB_TABLES = XMB_DB.query("SHOW TABLES").to_a.map {|h| h.flatten[1]} # array of 
 PHPBB_DB = Mysql2::Client.new(host: "127.0.0.1", username: "sm", password: "science", port: 3306, database: "sm_phpbb")
 PHPBB_TABLES = PHPBB_DB.query("SHOW TABLES").to_a.map {|h| h.flatten[1]} # array of phpbb table names
 
+# A hash mapping XMB forums numbers to their phpbb counterparts
+X2P_FID = {2=>5, 11=>21, 3=>12, 13=>1, 5=>7, 6=>9, 7=>18, 9=>11, 10=>6, 12=>8, 14=>3, 15=>13, 16=>4,
+      19=>19, 20=>16, 22=>15, 23=>14, 24=>10, 8=>20}
+
+POST_ICONS = PHPBB_DB.query("SELECT SUBSTRING_INDEX(icons_url, '/', -1), icons_id FROM sm_icons").map {|h| h.values}.to_h
+
+SHITTY_XMB_LOGIC = {"no" => 1, "yes" => 0}
+
 require './sqltable.rb'
 require './usertable.rb'
 require './posttable.rb'

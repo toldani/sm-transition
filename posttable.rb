@@ -32,7 +32,7 @@ class PostTable < SQLTable
 			topic_id: x['tid'],
 			forum_id: X2P_FID[x['fid']],
 			poster_id: u['uid'],
-			icon_id: POST_ICONS[x['icon']].to_s,
+			icon_id: POST_ICONS[x['icon']],
 			poster_ip: x['useip'],
 			post_time: x['dateline'],
 			post_reported: 0,
