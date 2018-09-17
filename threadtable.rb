@@ -14,7 +14,14 @@ class ThreadTable < SQLTable
   end
 
   # thread id and a reference to an array of all the posts in that thread
-  def to_phpbb(tid, arp)
+  def to_phpbb(thread, arp)
+
+    if thread.is_a?(Hash) && thread['tid']
+      tid = thread['tid']
+    else
+      tid = thread
+    end
+    
     x = self[tid]
 
     has_attach = !!PHPBB.attachments.find_by('topic_id', tid)
@@ -65,6 +72,7 @@ class ThreadTable < SQLTable
       topic_posts_unapproved: 0,
       topic_posts_softdeleted: 0
     }
+
 
     return {"sm_topics" => h}
   end
