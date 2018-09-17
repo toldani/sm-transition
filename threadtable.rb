@@ -21,10 +21,10 @@ class ThreadTable < SQLTable
     else
       tid = thread
     end
-    
+
     x = self[tid]
 
-    has_attach = !!PHPBB.attachments.find_by('topic_id', tid)
+    has_attach = PHPBB.attachments.find_by('topic_id', tid).empty? == false
 
     first_post = arp.first
     first_poster = XMB.members[first_post['username']]
