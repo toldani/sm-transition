@@ -2,6 +2,17 @@
 
 class ThreadTable < SQLTable
 
+  #get sorted array of posts in a thread
+  def post_list(thread)
+    if thread.is_a?(Hash) && thread['tid']
+      tid = thread['tid']
+    else
+      tid = thread
+    end
+
+    return XMB.posts.where(tid: tid).sort_by {|i| i['pid']}
+  end
+
   # thread id and a reference to an array of all the posts in that thread
   def to_phpbb(tid, arp)
     x = self[tid]
