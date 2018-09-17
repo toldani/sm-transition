@@ -1,7 +1,8 @@
 class String
   # colorization
-  def colorize(color_code)
-  	colors = {"k" => 0, "r" => 1, "g" => 2, "y" => 3, "b" => 4, "p" => 5, "c" => 6, "w" => 7}
+  def colorize(cc)
+  	# symbols +, -, _, and * can precede color letter (bright, dim, underline, bold)
+  	colors = {"k" => 0, "r" => 1, "g" => 2, "y" => 3, "b" => 4, "m" => 5, "c" => 6, "w" => 7}
     "\e[#{color_code}m#{self}\e[0m"
   end
 

@@ -13,22 +13,22 @@ class AttachmentTable < SQLTable
 		tid = XMB.posts[x['pid']]['tid']
 
 		h = {
-					attach_id: x['aid'],
-					post_msg_id: x['pid'],
-					topic_id: tid,
-					in_message: 0,
-					poster_id: x['uid'],
-					is_orphan: 0,
-					physical_filename: md5,
-					real_filename: x['filename'],
-					download_count: x['downloads'],
-					attach_comment: "",
-					extension: x['filename'].split('.')[-1],
-					mimetype: x['filetype'],
-					filesize: x['filesize'],
-					filetime: x['updatetime'].to_i,
-					thumbnail: i
-				}
+			attach_id: x['aid'],
+			post_msg_id: x['pid'],
+			topic_id: tid,
+			in_message: 0,
+			poster_id: x['uid'],
+			is_orphan: 0,
+			physical_filename: md5,
+			real_filename: x['filename'],
+			download_count: x['downloads'],
+			attach_comment: "",
+			extension: x['filename'].split('.')[-1],
+			mimetype: x['filetype'],
+			filesize: x['filesize'],
+			filetime: x['updatetime'].to_i,
+			thumbnail: i
+		}
 
 		unless File.exist?(CSPATH+md5)
 			FileUtils.cp(path, CSPATH+md5)

@@ -23,9 +23,9 @@ require './usertable.rb'
 require './posttable.rb'
 require './attachmenttable.rb'
 
-# A hash mapping XMB forums numbers to their phpbb counterparts
-X2P_FID = {2=>5, 11=>21, 3=>12, 13=>1, 5=>7, 6=>9, 7=>18, 9=>11, 10=>6, 12=>8, 14=>3, 15=>13, 16=>4,
-				19=>19, 20=>16, 22=>15, 23=>14, 24=>10, 8=>20}
+# calling .to_i on true or false will return 1 or 0
+class FalseClass; def to_i; 0 end end
+class TrueClass; def to_i; 1 end end
 
 @table_class = Hash.new(SQLTable)
 @table_class.merge!("users" => UserTable, "members" => UserTable, "posts" => PostTable, "attachments" => AttachmentTable)
