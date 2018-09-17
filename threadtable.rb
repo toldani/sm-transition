@@ -27,10 +27,10 @@ class ThreadTable < SQLTable
     has_attach = PHPBB.attachments.find_by('topic_id', tid).empty? == false
 
     first_post = arp.first
-    first_poster = XMB.members[first_post['username']]
+    first_poster = XMB.members[first_post['author']]
 
     last_post = arp.last
-    last_poster = XMB.members[last_post['username']]
+    last_poster = XMB.members[last_post['author']]
 
     h = {
       topic_id: x['tid'],
@@ -50,7 +50,7 @@ class ThreadTable < SQLTable
       topic_first_poster_colour: "",
       topic_last_post_id: last_post['pid'],
       topic_last_poster_id: last_poster['uid'],
-      topic_last_poster_name: last_post['username'],
+      topic_last_poster_name: last_post['author'],
       topic_last_poster_colour: "",
       topic_last_post_subject: last_post['subject'],
       topic_last_post_time: last_post['dateline'],
