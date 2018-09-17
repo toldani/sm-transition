@@ -4,7 +4,7 @@ class PostTable < SQLTable
 
 	# given an id for an XMB forum, return the columns and values in phpBB format using XMB data
 	def to_phpbb(post)
-		if post.is_a?(Hash) && post.values.include?("pid")
+		if post.is_a?(Hash)
 			x = post
 		else
 			x = self[post]
