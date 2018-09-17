@@ -39,7 +39,7 @@ class ThreadTable < SQLTable
       topic_attachment: has_attach.to_i,
       topic_reported: 0,
       topic_title: x['subject'],
-      topic_poster: x['author'],
+      topic_poster: first_poster['uid'],
       topic_time: first_post['dateline'],
       topic_time_limit: 0,
       topic_views: x['views'],

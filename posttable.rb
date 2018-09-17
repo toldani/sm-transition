@@ -10,16 +10,16 @@ class PostTable < SQLTable
 			x = self[post]
 		end
 
-		pid = x['pid']
+		z = x['pid']
 
 		u = XMB.members[x['author']]
 
-		has_attach = !!PHPBB.attachments.find_by('post_msg_id', pid)
+		has_attach = !!PHPBB.attachments.find_by('post_msg_id', z)
 
 		rquote_regex = /\[rquote\=(\d+)&amp;tid=\d+&amp;author=(.*?)\]/
 
 		text = x['message'].gsub(rquote_regex) do |m|
-			pid, username = RQUOTE_RX.match(m).captures
+			pid, username = rquote_regex.match(m).captures
 	  	post_time = XMB.posts[pid]['dateline']
 	  	uid = XMB.members[username]['uid']
 			"[quote=#{username} post_id=#{pid} time=#{post_time} user_id=#{uid}]"
