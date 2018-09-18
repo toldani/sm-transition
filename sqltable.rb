@@ -100,6 +100,9 @@ class SQLTable
 			begin
 				PHPBB_DB.query(q)
 			rescue Mysql2::Error => e
+				puts "Error with query: #{q}"
+				puts "Record is: #{h}" 
+				puts e.backtrace.join("\n")
 				puts e
 				next
 			end
