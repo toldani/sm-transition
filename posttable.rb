@@ -32,7 +32,7 @@ class PostTable < SQLTable
 
 		text.gsub!("[/rquote]", "[/quote]")
 
-		text = CGI.unescape_html(text)
+		text = CGI.unescape_html(text).gsub(/\\(?=['"])/, '')
 
 		h = {
 			post_id: x['pid'],
