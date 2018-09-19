@@ -124,7 +124,7 @@ class SQLTable
 			if /[^\\][\'\"]/.match?(v)
 				return "'#{PHPBB_DB.escape(v)}'"
 			else
-				return "#{v}"
+				return "'#{v}'"
 			end
 		end
 	end
