@@ -68,7 +68,7 @@ class ThreadTable < SQLTable
       topic_delete_time: 0,
       topic_delete_reason: "",
       topic_delete_user: 0,
-      topic_posts_approved: x['length'],
+      topic_posts_approved: arp['length'],
       topic_posts_unapproved: 0,
       topic_posts_softdeleted: 0
     }

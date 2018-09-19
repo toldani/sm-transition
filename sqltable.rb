@@ -17,7 +17,7 @@ class SQLTable
 		@columns = @db.query("DESCRIBE #{t}").map {|h| h['Field']}
 	end
 
-	def inspect
+	def inspectinspect
 		clist = @columns.map {|s| @pkey == s ? "\e[1m#{s} (PK)\e[0m" : s} * "\n\t"
 		"\n\e[92m#{@table_name}\e[0m (#{self.class}, #{count} row#{"s" if count != 1}): \n\t#{clist}\n"
 	end
@@ -116,11 +116,16 @@ class SQLTable
 
 	# class variables follow
 	# format a value for assigment in SQL
+	# don't escape the quotes if they're already escaped
 	def self.sanitize(v)
 		if v.is_a?(Numeric)
 			return v.to_s
 		elsif v.is_a?(String)
-			return "'#{PHPBB_DB.escape(v)}'"
+			if /[^\\][\'\"]/.match?(v)
+				return "'#{PHPBB_DB.escape(v)}'"
+			else
+				return "#{v}"
+			end
 		end
 	end
 
