@@ -2,6 +2,11 @@
 
 class ThreadTable < SQLTable
 
+  def initialize(t)
+    @start_row = PHPBB_DB.query("SELECT MAX(topic_id) FROM sm_topics").first.values.first
+    super
+  end
+
   #get sorted array of posts in a thread
   def post_list(thread)
     if thread.is_a?(Hash) && thread['tid']
