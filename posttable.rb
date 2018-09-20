@@ -21,7 +21,7 @@ class PostTable < SQLTable
 		q = "SELECT xmb_posts.*, xmb_members.uid, xmb_attachments.aid FROM xmb_posts 
 					LEFT JOIN xmb_members ON xmb_posts.author = xmb_members.username
 					LEFT JOIN xmb_attachments ON xmb_posts.pid = xmb_attachments.pid
-					WHERE xmb_posts.tid = #{tid}"
+					WHERE xmb_posts.tid = #{tid} GROUP BY xmb_posts.pid"
 		post_array = XMB_DB.query(q).to_a
 
 		row_list = []
