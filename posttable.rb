@@ -18,10 +18,11 @@ class PostTable < SQLTable
 
 		# has_attach = !PHPBB.attachments.find_by('post_msg_id', z).empty?
 
-		q = "SELECT xmb_posts.*, xmb_members.uid FROM xmb_posts, xmb_members WHERE xmb_posts.tid = #{tid} AND xmb_posts.author = xmb_members.username"
+		q = "SELECT xmb_posts.*, xmb_members.uid, xmb_attachments.aid FROM xmb_posts 
+					LEFT JOIN xmb_members ON xmb_posts.author = xmb_members.username
+					LEFT JOIN xmb_attachments ON xmb_posts.pid = xmb_attachments.pid
+					WHERE xmb_posts.tid = #{tid}"
 		post_array = XMB_DB.query(q).to_a
-		q2 = "SELECT xmb_attachments.pid FROM xmb_attachments WHERE pid IN (SELECT pid FROM xmb_posts WHERE xmb_posts.tid = #{tid})"
-		attach_list = XMB_DB.query(q2, as: :array).to_a.flatten
 
 		row_list = []
 
@@ -60,7 +61,7 @@ class PostTable < SQLTable
 				post_subject: x['subject'],
 				post_text: text,
 				post_checksum: "",
-				post_attachment: bool2int(attach_list.include?(x['pid'])),
+				post_attachment: bool2int(!!x['aid']),
 				bbcode_bitfield: "",
 				bbcode_uid: "",
 				post_postcount: 1,
