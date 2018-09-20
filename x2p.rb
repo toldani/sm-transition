@@ -14,7 +14,7 @@ module X2P
 
   POST_ICONS = PHPBB_DB.query("SELECT SUBSTRING_INDEX(icons_url, '/', -1), icons_id FROM sm_icons").map {|h| h.values}.to_h
 
-  @rows_written = 0
+  $rows_written = 0
 
   #SHITTY_XMB_LOGIC = {"no" => 1, "yes" => 0}
 
@@ -71,11 +71,11 @@ module X2P
         next
       end
 
-      if @rows_written < 100 || @rows_written % 20 == 0 # only output 1/10 of writes to the console after the first 100 writes
+      if $rows_written < 100 || $rows_written % 20 == 0 # only output 1/10 of writes to the console after the first 100 writes
         puts "Wrote \e[32m#{h}\e[0m to \e[36m#{t}\e[0m"
       end
     end
-    @rows_written += 1
+    $rows_written += 1
   end
 
   # return md5 checksum of a file 
