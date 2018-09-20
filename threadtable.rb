@@ -26,11 +26,8 @@ class ThreadTable < SQLTable
 
     has_attach = !PHPBB.attachments.find_by('topic_id', tid).empty?
 
-    first_post = arp.first
-    first_poster = XMB.members[first_post['author']]
-
-    last_post = arp.last
-    last_poster = XMB.members[last_post['author']]
+    first_post = arp.first['sm_posts']
+    last_post = arp.last['sm_posts']
 
     h = {
       topic_id: x['tid'],
@@ -39,22 +36,22 @@ class ThreadTable < SQLTable
       topic_attachment: has_attach.to_i,
       topic_reported: 0,
       topic_title: x['subject'],
-      topic_poster: first_poster['uid'],
-      topic_time: first_post['dateline'],
+      topic_poster: first_post[:poster_id],
+      topic_time: first_post[:post_time],
       topic_time_limit: 0,
       topic_views: x['views'],
       topic_status: 0,
-      topic_type: 0,
-      topic_first_post_id: first_post['pid'],
-      topic_first_poster_name: first_poster['username'],
+      topic_type: x['topped'],
+      topic_first_post_id: first_post[:post_id],
+      topic_first_poster_name: first_post[:post_username],
       topic_first_poster_colour: "",
-      topic_last_post_id: last_post['pid'],
-      topic_last_poster_id: last_poster['uid'],
-      topic_last_poster_name: last_post['author'],
+      topic_last_post_id: last_post[:post_id],
+      topic_last_poster_id: last_post[:poster_id],
+      topic_last_poster_name: last_post[:post_username],
       topic_last_poster_colour: "",
-      topic_last_post_subject: last_post['subject'],
-      topic_last_post_time: last_post['dateline'],
-      topic_last_view_time: last_post['dateline'],
+      topic_last_post_subject: last_post[:post_subject],
+      topic_last_post_time: last_post[:post_time],
+      topic_last_view_time: last_post[:post_time],
       topic_moved_id: 0,
       topic_bumped: 0,
       topic_bumper: 0,

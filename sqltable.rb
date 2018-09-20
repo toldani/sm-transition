@@ -5,6 +5,7 @@ class SQLTable
 
 	# creates reader methods for these instance variables
 	attr_reader :table_name, :pkey, :columns, :db
+	attr_accessor :start_row
 
 	# store a bunch of useful data in instance variables (database, table name, primary key, array of
 	# column names, number of rows inserted)
@@ -13,6 +14,7 @@ class SQLTable
 		@table_name = t
 		@pkey = @db.query("SHOW KEYS FROM #{t} WHERE Key_name = 'PRIMARY'").first['Column_name'] rescue nil
 		@columns = @db.query("DESCRIBE #{t}").map {|h| h['Field']}
+		@start_row = 1
 	end
 
 	def inspect
@@ -45,7 +47,7 @@ class SQLTable
 
 	# returns non-empty rows in the order of their primary keys
 	def each
-		(1..self.max).each do |n|
+		(@start_row..self.max).each do |n|
 			next if self[n].nil? || self[n].empty?
 			yield self[n]
 		end

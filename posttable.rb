@@ -58,7 +58,7 @@ class PostTable < SQLTable
 				enable_smilies: bool2int(x['smileyoff'], invert: true),
 				enable_magic_url: 1,
 				enable_sig: bool2int(x['usesig']),
-				post_username: x['username'],
+				post_username: x['author'],
 				post_subject: x['subject'],
 				post_text: text,
 				post_checksum: "",
