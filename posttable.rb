@@ -3,9 +3,6 @@ require './sm_transition.rb'
 # has special methods unique to post tables
 class PostTable < SQLTable
 
-	def array_from_thread(tid)
-	end
-
 	# given an id for an XMB forum, return the columns and values in phpBB format using XMB data
 	def to_phpbb(tid)
 
@@ -61,7 +58,7 @@ class PostTable < SQLTable
 				enable_smilies: bool2int(x['smileyoff'], invert: true),
 				enable_magic_url: 1,
 				enable_sig: bool2int(x['usesig']),
-				post_username: u['username'],
+				post_username: x['username'],
 				post_subject: x['subject'],
 				post_text: text,
 				post_checksum: "",
