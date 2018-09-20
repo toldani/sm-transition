@@ -10,8 +10,6 @@ require 'fileutils' # File utilities
 require 'cgi' # Misc. network functions
 require 'yaml' # useful for text parsing and other things
 
-rows_written = 0
-
 require './x2p.rb'
 include X2P
 
