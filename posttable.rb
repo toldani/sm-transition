@@ -31,10 +31,8 @@ class PostTable < SQLTable
 			text = x['message'].gsub(rquote_regex) do |m|
 				begin
 					pid = rquote_regex.match(m).captures.first.to_i
-					quoted_post = post_array.bsearch {|e| e['pid'] == pid}
-			  	post_time = quoted_post['dateline']
-			  	uid = quoted_post['uid']
-					"[quote=#{username} post_id=#{pid} time=#{post_time} user_id=#{uid}]"
+					quoted_post = post_array.find {|z| z['pid'] == pid}
+					"[quote=#{quoted_post['author']} post_id=#{pid} time=#{quoted_post['dateline']} user_id=#{quoted_post['uid']}]"
 				rescue => e
 					puts "Error #{e} when replacing rquote tag"
 					"[quote]"
