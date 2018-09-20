@@ -9,7 +9,7 @@ class AttachmentTable < SQLTable
 		x = self[aid]
 		thumb_path = path.sub("/#{aid}/", "/#{aid+1}/") + "-thumb.jpg"
 		i = File.exist?(thumb_path) ? 1 : 0
-		md5 = self.class.md5sum(path)
+		md5 = md5sum(path)
 		tid = XMB.posts[x['pid']]['tid']
 
 		h = {
@@ -36,11 +36,5 @@ class AttachmentTable < SQLTable
 		end
 
 		return {"sm_attachments" => h}
-	end
-
-
-	# return md5 checksum of a file	
-	def self.md5sum(path)
-		return `md5sum #{path}`[/^[0-9a-f]+/] if File.exist?(path)
 	end
 end

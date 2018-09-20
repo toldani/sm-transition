@@ -3,8 +3,6 @@
 class SQLTable
 	include Enumerable
 
-	@@rows_written = 0
-
 	# creates reader methods for these instance variables
 	attr_reader :table_name, :pkey, :columns, :db
 
@@ -17,7 +15,7 @@ class SQLTable
 		@columns = @db.query("DESCRIBE #{t}").map {|h| h['Field']}
 	end
 
-	def inspectinspect
+	def inspect
 		clist = @columns.map {|s| @pkey == s ? "\e[1m#{s} (PK)\e[0m" : s} * "\n\t"
 		"\n\e[92m#{@table_name}\e[0m (#{self.class}, #{count} row#{"s" if count != 1}): \n\t#{clist}\n"
 	end
@@ -37,7 +35,7 @@ class SQLTable
 			ar = @db.query("DESCRIBE #{@table_name}").to_a
 			no_default = ar.select {|r| r['Null'] == "NO" && r['Default'].nil?}
 			no_default.each do |h|
-				@default_row[h['Field']] = self.class.guess_column_default(h['Type'])
+				@default_row[h['Field']] = guess_column_default(h['Type'])
 			end
 			puts @default_row.inspect
 		end
@@ -65,12 +63,12 @@ class SQLTable
 
 	# look up a value in the the specified column. does not check for duplicates.
 	def find_by(column, value)
-		@db.query("SELECT * FROM #{@table_name} WHERE #{column} = #{SQLTable.sanitize(value)} LIMIT 1").first.to_h
+		@db.query("SELECT * FROM #{@table_name} WHERE #{column} = #{sanitize(value)} LIMIT 1").first.to_h
 	end
 
 	# get a bunch of records that match a value of a single record (column_name: value, other_table_name: other_column_name)
 	def where(*cols, **conditions)
-		q = conditions.map {|k,v| "#{k} = #{SQLTable.sanitize(v)}"} * ' AND '
+		q = conditions.map {|k,v| "#{k} = #{sanitize(v)}"} * ' AND '
 		c = (cols & @columns) * ', '
 		c = "*" if c.empty?
 		puts q
@@ -85,67 +83,6 @@ class SQLTable
 	# count the rows in a table
 	def count
 		@db.query("SELECT COUNT(*) FROM #{@table_name}").first.values[-1]
-	end
-
-	# write a row to the specified table. data is supplied as a hash, where key names correspond to column names
-	def self.insert_record(r)
-		# if the hash keys are all valid writable table names, then write rows to multiple tables
-		return nil if (r.keys & PHPBB_TABLES) != r.keys
-
-		r.each_pair do |t,h|
-			h.delete_if {|k,v| v.nil?}
-			vstring = h.values.map {|g| self.sanitize(g)} * ', '
-			kstring = h.keys * ', '
-			q = "INSERT INTO #{t} (#{kstring}) VALUES (#{vstring})"
-			begin
-				PHPBB_DB.query(q)
-			rescue Mysql2::Error => e
-				puts "Error with query: #{q}"
-				puts "Record is: #{h}" 
-				puts e.backtrace.join("\n")
-				puts e
-				next
-			end
-
-			if @@rows_written < 100 || @@rows_written % 20 == 0 # only output 1/10 of writes to the console after the first 100 writes
-				puts "Wrote \e[32m#{h}\e[0m to \e[36m#{t}\e[0m"
-			end
-		end
-		@@rows_written += 1
-	end
-
-	# class variables follow
-	# format a value for assigment in SQL
-	# don't escape the quotes if they're already escaped
-	def self.sanitize(v)
-		if v.is_a?(Numeric)
-			return v.to_s
-		elsif v.is_a?(String)
-			return "'#{PHPBB_DB.escape(v)}'"
-		end
-	end
-
-	# returns an empty value, corresponding to the data type of the column
-	def self.guess_column_default(y)
-		y = y['Type'] if y.is_a?(Hash)
-
-		if !!y[/(char\(\d+\)|text)/] # column contains string
-			return ""
-		elsif !!y[/int\(\d+\)/] # column contains a type of int
-			return 0
-		else
-			return 0.0
-		end
-	end
-
-	# get SQLTable object by passing in table name as a string
-	def self.lookup(str)
-		d, t = str.match(/^(xmb|sm)_(\w+)/).captures
-		if d == "xmb"
-			return XMB[t]
-		elsif d == "sm"
-			return PHPBB[t]
-		end
 	end
 
 protected
