@@ -79,7 +79,7 @@ module X2P
   end
 
   # return md5 checksum of a file 
-  def self.md5sum(path)
+  def md5sum(path)
     return `md5sum #{path}`[/^[0-9a-f]+/] if File.exist?(path)
   end
 
