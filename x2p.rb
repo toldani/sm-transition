@@ -93,6 +93,18 @@ module X2P
     return {true => 1, false => 0}[bool]
   end
 
+  def update_bbcode(pid)
+    txt = PHPBB.posts[pid]['post_text']
+    repl = fix_bbcode(txt)
+    if repl
+      q = "UPDATE sm_posts SET post_text = #{sanitize(repl)} WHERE post_id = #{pid}"
+      puts q
+      PHPBB_DB.query(q)
+    else
+      puts "Nothing to change..."
+    end
+  end
+
   def fix_bbcode(text)
     txt = text.dup
     bb = txt.scan(UNPROCESSED_RX).flatten.compact
@@ -119,6 +131,6 @@ module X2P
       txt = "<r>#{body}</r>" unless body.nil?
     end
     
-    return txt
+    return bb.empty? ? nil : txt
   end
 end
