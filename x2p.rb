@@ -92,7 +92,6 @@ module X2P
     bool = YAML.load(str.to_s) != invert # inverts bool if invert=true
     return {true => 1, false => 0}[bool]
   end
-end
 
   def fix_bbcode(text)
     txt = text.dup
@@ -122,5 +121,4 @@ end
     
     return txt
   end
-
 end
