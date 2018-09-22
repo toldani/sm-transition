@@ -93,15 +93,17 @@ module X2P
     return {true => 1, false => 0}[bool]
   end
 
-  def update_bbcode(pid)
-    txt = PHPBB.posts[pid]['post_text']
-    repl = fix_bbcode(txt)
-    if repl
-      q = "UPDATE sm_posts SET post_text = #{sanitize(repl)} WHERE post_id = #{pid}"
-      puts q
-      PHPBB_DB.query(q)
-    else
-      puts "Nothing to change..."
+  def update_bbcode(tid)
+    PHPBB.posts.where("post_id", "post_text", topic_id: tid).each do |t|
+      txt = t['post_text']
+      repl = fix_bbcode(txt)
+      if repl
+        q = "UPDATE sm_posts SET post_text = #{sanitize(repl)} WHERE post_id = #{t['post_id']}"
+        puts q
+        PHPBB_DB.query(q)
+      else
+        puts "Nothing to change..."
+      end
     end
   end
 
