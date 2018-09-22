@@ -15,7 +15,7 @@ PHPBB.forums.each do |f|
 
   h = {
     forum_last_post_id: last_post['post_id'],
-    forum_last_poster_id: last_post['user_id'],
+    forum_last_poster_id: last_post['poster_id'],
     forum_last_post_subject: last_subject,
     forum_last_post_time: last_post['post_time'],
     forum_last_poster_name: last_post['post_username'],
