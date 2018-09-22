@@ -93,26 +93,27 @@ module X2P
     return {true => 1, false => 0}[bool]
   end
 
-  def fix_bbcode(txt)
-    bb = txt.scan(UNPROCESSED_RX).flatten.compact.uniq
+  def fix_bbcode(text)
+    txt = text.dup
+    bb = txt.scan(UNPROCESSED_RX).flatten.compact
     bb.each do |x|
       case x
       when "[quote]" #, "[img]", "[sup]"
-        txt.sub(x, "<QUOTE><s>[quote]</s>")
-        txt.sub(/(?<!<e>)\[\/quote\]/, "<e>[/quote]</e></QUOTE>")
+        txt.sub!(x, "<QUOTE><s>[quote]</s>")
+        txt.sub!(/(?<!<e>)\[\/quote\]/, "<e>[/quote]</e></QUOTE>")
       when /\[quote=.+?\]/
         username, pid, time, uid = /\[quote=(.+?) post_id=(\d+) time=(\d+) user_id=(\d+)\]/.match(x).captures
         repl = "<QUOTE author=\"#{username}\" post_id=\"#{pid}\" time=\"#{time}\" user_id=\"#{uid}\"><s>#{x}</s>"
-        txt.sub(x, repl)
-        txt.sub(/(?<!<e>)\[\/quote\]/, "<e>[/quote]</e></QUOTE>")
+        txt.sub!(x, repl)
+        txt.sub!(/(?<!<e>)\[\/quote\]/, "<e>[/quote]</e></QUOTE>")
       when /\[size=(-[12]|[1-6])\]/
         n = x[/(?<=\[size=)-?\d+/].to_i
         m = SIZE_MAP[n]
-        txt.sub(x, "<SIZE size=\"#{m}\"><s>[size=#{m}]</s>")
-        txt.sub(/(?<!<e>)\[\/size\]/, "<e>[/size]</e></SIZE>")
+        txt.sub!(x, "<SIZE size=\"#{m}\"><s>[size=#{m}]</s>")
+        txt.sub!(/(?<!<e>)\[\/size\]/, "<e>[/size]</e></SIZE>")
       end
     end
-    
+
     unless bb.empty?
       body = txt[/(?<=^<t>).*(?=<\/t>$)/m]
       txt = "<r>#{body}</r>" unless body.nil?
