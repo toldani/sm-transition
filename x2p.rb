@@ -112,5 +112,13 @@ module X2P
         txt.sub(/(?<!<e>)\[\/size\]/, "<e>[/size]</e></SIZE>")
       end
     end
+    
+    unless bb.empty?
+      body = txt[/(?<=^<t>).*(?=<\/t>$)/m]
+      txt = "<r>#{body}</r>" unless body.nil?
+    end
+    
+    return txt
   end
+
 end
