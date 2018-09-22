@@ -3,9 +3,10 @@ require './sm_transition.rb'
 # import custom ranks
 
 PHPBB.forums.each do |f|
+  next if f['forum_type'] == 0
   last_post = PHPBB_DB.query("SELECT * FROM sm_posts WHERE forum_id = #{f['forum_id']} ORDER BY post_id DESC LIMIT 1").first
-  post_count = PHPBB_DB.query("SELECT COUNT (*) FROM sm_posts WHERE forum_id = #{f['forum_id']}").first.values[0]
-  topic_count = PHPBB_DB.query("SELECT COUNT (*) FROM sm_topics WHERE forum_id = #{f['forum_id']}").first.values[0]
+  post_count = PHPBB_DB.query("SELECT COUNT(*) FROM sm_posts WHERE forum_id = #{f['forum_id']}").first.values[0]
+  topic_count = PHPBB_DB.query("SELECT COUNT(*) FROM sm_topics WHERE forum_id = #{f['forum_id']}").first.values[0]
   last_subject = PHPBB.topics[last_post['topic_id']]['topic_title']
 
   h = {
