@@ -115,7 +115,7 @@ module X2P
       when "[quote]" #, "[img]", "[sup]"
         txt.sub!(x, "<QUOTE><s>[quote]</s>")
         txt.sub!(/(?<!<e>)\[\/quote\]/, "<e>[/quote]</e></QUOTE>")
-      when /\[quote=.+?\]/
+      when /\[quote=(.+?) post_id=(\d+) time=(\d+) user_id=(\d+)\]/
         username, pid, time, uid = /\[quote=(.+?) post_id=(\d+) time=(\d+) user_id=(\d+)\]/.match(x).captures
         repl = "<QUOTE author=\"#{username}\" post_id=\"#{pid}\" time=\"#{time}\" user_id=\"#{uid}\"><s>#{x}</s>"
         txt.sub!(x, repl)
