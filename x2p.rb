@@ -14,6 +14,9 @@ module X2P
 
   POST_ICONS = PHPBB_DB.query("SELECT SUBSTRING_INDEX(icons_url, '/', -1), icons_id FROM sm_icons").map {|h| h.values}.to_h
 
+  SIZE_MAP = {-2 => 75, -1 => 85, 0 => 100, 1 => 110, 2 => 125, 3 => 140, 4 => 160, 5 => 180, 6 => 200}
+  UNPROCESSED_RX = /<s>\[.*?\]<\/s>|(\[[^\/E\d].*?\])/
+
   $rows_written = 0
 
   #SHITTY_XMB_LOGIC = {"no" => 1, "yes" => 0}
@@ -88,5 +91,26 @@ module X2P
     invert = opts[:invert]
     bool = YAML.load(str.to_s) != invert # inverts bool if invert=true
     return {true => 1, false => 0}[bool]
+  end
+
+  def fix_bbcode(txt)
+    bb = txt.scan(UNPROCESSED_RX).flatten.compact.uniq
+    bb.each do |x|
+      case x
+      when "[quote]" #, "[img]", "[sup]"
+        txt.sub(x, "<QUOTE><s>[quote]</s>")
+        txt.sub(/(?<!<e>)\[\/quote\]/, "<e>[/quote]</e></QUOTE>")
+      when /\[quote=.+?\]/
+        username, pid, time, uid = /\[quote=(.+?) post_id=(\d+) time=(\d+) user_id=(\d+)\]/.match(x).captures
+        repl = "<QUOTE author=\"#{username}\" post_id=\"#{pid}\" time=\"#{time}\" user_id=\"#{uid}\"><s>#{x}</s>"
+        txt.sub(x, repl)
+        txt.sub(/(?<!<e>)\[\/quote\]/, "<e>[/quote]</e></QUOTE>")
+      when /\[size=(-[12]|[1-6])\]/
+        n = x[/(?<=\[size=)-?\d+/].to_i
+        m = SIZE_MAP[n]
+        txt.sub(x, "<SIZE size=\"#{m}\"><s>[size=#{m}]</s>")
+        txt.sub(/(?<!<e>)\[\/size\]/, "<e>[/size]</e></SIZE>")
+      end
+    end
   end
 end

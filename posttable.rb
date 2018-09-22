@@ -82,5 +82,9 @@ class PostTable < SQLTable
 		return row_list
 	end
 
+	#AFTER = "<QUOTE author=\"Arrhenius\" post_id=\"185095\" time=\"1281689105\" user_id=\"13738\"><s>[quote=Arrhenius post_id=185095 time=1281689105 user_id=13738]</s>"
+
+	#BBCODE_RX = /\[(?<tag>[A-Za-z]+)\=?(?<params>.*?)?\](?<body>.*?)\[\/\k<tag>\]/ # /\[([A-Za-z]+)\=?(.*?)?\](.*?)\[\/\1\]/
+	#PARSED_RX = /<(s|e)>.*?<\/\1>/
 
 end
