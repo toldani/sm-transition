@@ -87,6 +87,11 @@ class SQLTable
 		@db.query("SELECT COUNT(*) FROM #{@table_name}").first.values[-1]
 	end
 
+  def update_row(pkid, **args)
+    r = args.keys.map {|k| "#{k} = #{sanitize(args[k])}"} * ', '
+    PHPBB_DB.query("UPDATE #{@table_name} SET #{r} WHERE #{@pkey} = #{pkid}")
+  end
+
 protected
 
 	# check if a table is from XMB before attempting to write to it
