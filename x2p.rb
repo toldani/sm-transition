@@ -113,7 +113,7 @@ module X2P
     bb.each do |x|
       case x
       when "[quote]" #, "[img]", "[sup]"
-        txt.sub!(x, "<QUOTE><s>[quote]</s>")
+        txt.sub!(/(?<!<s>)\[quote\]/, "<QUOTE><s>[quote]</s>")
         txt.sub!(/(?<!<e>)\[\/quote\]/, "<e>[/quote]</e></QUOTE>")
       when /\[quote=(.+?) post_id=(\d+) time=(\d+) user_id=(\d+)\]/
         username, pid, time, uid = /\[quote=(.+?) post_id=(\d+) time=(\d+) user_id=(\d+)\]/.match(x).captures
