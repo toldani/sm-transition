@@ -10,6 +10,7 @@ end
 amap.keys.each do |p|
   txt = PHPBB.posts[p]['post_text']
   orig = txt.dup
+  next unless txt.is_a?(String)
 
   aid_list = amap[p].keys.sort.reverse
   aid_list.each_with_index do |f,i|
