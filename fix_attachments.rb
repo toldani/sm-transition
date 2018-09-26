@@ -1,43 +1,26 @@
 
 require './sm_transition.rb'
 
-hdpath = "/mnt/vmdisk/attachments/"
+amap = {}
 
-dlist = Dir.glob(hdpath+"*")
-
-dlist.each do |p|
-  Dir.glob(p+"/*/*").sort.each do |f|
-  	next if f[/-thumb\.jpg$/]
-  	aid = f.split('/')[-2].to_i
-  	a = XMB.attachments.to_phpbb(aid, f)
-  	puts a
-  	SQLTable.insert_record(a)
-  end
+PHPBB_DB.query("SELECT attach_id, real_filename, post_msg_id FROM sm_attachments WHERE post_msg_id IS NOT NULL").each do |h|
+  amap[h['post_msg_id']] = amap[h['post_msg_id']].to_h.merge(h['attach_id'] => h['real_filename'])
 end
 
+amap.keys.each do |p|
+  txt = PHPBB.posts[p]['post_text']
+  orig = txt.dup
 
+  aid_list = amap[p].keys.sort.reverse
+  aid_list.each_with_index do |f,i|
+    s = "<FILE content=\"#{f}\"><s>[file]</s>#{f}<e>[/file]</e></FILE>"
+    r = "<ATTACHMENT filename=\"#{amap[p][f]}\" index=\"#{i}\"><s>[attachment=#{i}]</s>#{amap[p][f]}<e>[/attachment]</e></ATTACHMENT>"
+    txt.sub!(s, r)
+  end
 
-  
-
-=begin
-
-(1..X_ATTACH.max).each do |n|
-	a = X_ATTACH[n]
-	next if a.nil?
-	`gsutil mv 
-	if a['parentid'] == 0
-		p = X_POSTS[a["pid"]]
-		u = X_MEMBERS.find_by('username', p['author'])
-		h = {
-			"attach_id" => a["aid"],
-			"post_message_id" => a["pid"],
-			"topic_id" => p["tid"],
-			"in_message" => 0,
-			"poster_id" => u["user_id"],
-			"is_orphan" => 0,
-			"physical_filename" => 
-
-
-
-sql = "SELECT aid AS attach_id, pid AS post_message_id,"
-=end
+  unless orig == txt
+    q = "UPDATE sm_posts SET post_text = #{sanitize(txt)} WHERE post_id = #{p}"
+    puts q if rand(0..20) == 0
+    PHPBB_DB.query(q)
+  end
+end

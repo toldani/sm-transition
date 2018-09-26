@@ -5,7 +5,7 @@ require './sm_transition.rb'
 # PHPBB_DB.query("DELETE FROM sm_topics WHERE topic_id = #{tmax}")
 # PHPBB_DB.query("DELETE FROM sm_posts WHERE topic_id = #{tmax}")
 
-XMB.threads.each do |t|
+PHPBB.topics.each do |t|
   plist = XMB.posts.to_phpbb(t['tid'])  #where(tid: t['tid']).sort_by {|i| i['pid']}
   topic = XMB.threads.to_phpbb(t, plist)
   insert_record(topic)

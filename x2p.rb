@@ -112,19 +112,21 @@ module X2P
     bb = txt.scan(UNPROCESSED_RX).flatten.compact
     bb.each do |x|
       case x
-      when "[quote]" #, "[img]", "[sup]"
-        txt.sub!(/(?<!<s>)\[quote\]/, "<QUOTE><s>[quote]</s>")
-        txt.sub!(/(?<!<e>)\[\/quote\]/, "<e>[/quote]</e></QUOTE>")
-      when /\[quote=(.+?) post_id=(\d+) time=(\d+) user_id=(\d+)\]/
+      when /(?<!<s>)\[quote\]/i #, "[img]", "[sup]"
+        txt.sub!(/(?<!<s>)\[quote\]/i, "<QUOTE><s>[quote]</s>")
+        txt.sub!(/(?<!<e>)\[\/quote\]/i, "<e>[/quote]</e></QUOTE>")
+      when /(?<!<s>)\[quote=(.+?) post_id=(\d+) time=(\d+) user_id=(\d+)\]/
         username, pid, time, uid = /\[quote=(.+?) post_id=(\d+) time=(\d+) user_id=(\d+)\]/.match(x).captures
         repl = "<QUOTE author=\"#{username}\" post_id=\"#{pid}\" time=\"#{time}\" user_id=\"#{uid}\"><s>#{x}</s>"
         txt.sub!(x, repl)
         txt.sub!(/(?<!<e>)\[\/quote\]/, "<e>[/quote]</e></QUOTE>")
-      when /\[size=(-[12]|[1-6])\]/
-        n = x[/(?<=\[size=)-?\d+/].to_i
+      when /(?<!<s>)\[size=(-[12]|[1-6])\]/i
+        n = x[/(?<=\[size=)-?\d+/i].to_i
         m = SIZE_MAP[n]
         txt.sub!(x, "<SIZE size=\"#{m}\"><s>[size=#{m}]</s>")
-        txt.sub!(/(?<!<e>)\[\/size\]/, "<e>[/size]</e></SIZE>")
+        txt.sub!(/(?<!<e>)\[\/size\]/i, "<e>[/size]</e></SIZE>")
+      else
+        bb = []
       end
     end
 
@@ -136,3 +138,5 @@ module X2P
     return bb.empty? ? nil : txt
   end
 end
+
+#<a href="./download/file.php?id={NUMBER}&amp;mode=view"><img src="./download/file.php?id={NUMBER}&amp;t=1" class="postimage" alt="DSCN0675.JPG" title="DSCN0675.JPG (1.79 MiB) Viewed 26 times"></a>
