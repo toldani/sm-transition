@@ -107,9 +107,9 @@ module X2P
     end
   end
 
-  def bb2rx(tag)
-    return "<#{tag.upcase}.*?><s>[#{tag}.*?]</s>
-    [/img]<e>[/url]</e></URL>"
+#  def bb2rx(tag)
+#    return "<#{tag.upcase}.*?><s>[#{tag}.*?]</s>
+#    [/img]<e>[/url]</e></URL>"
 
   def replace_in_posts(where,rx,repl)
     ar = PHPBB_DB.query("SELECT post_id, post_text FROM sm_posts WHERE #{where}").to_a
