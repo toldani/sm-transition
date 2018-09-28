@@ -110,12 +110,18 @@ module X2P
 #  def bb2rx(tag)
 #    return "<#{tag.upcase}.*?><s>[#{tag}.*?]</s>
 #    [/img]<e>[/url]</e></URL>"
-
-# "post_text LIKE '<r>%' AND post_text LIKE '%[/img]<e>[/url]</e></URL>%'"
-
-# where: "post_text LIKE '<r>%' AND post_text LIKE '%[img]<URL%'"
-# rx:    /\[img\]<URL url=\"(.+?)\">*.<\/URL>\[\/img\]/
+#
 # repl:  "<IMG src=\"\\1\"><s>[img]</s><URL url=\"\\1\">\\1</URL><e>[/img]</e></IMG>"
+#
+# where: "post_text LIKE '<r>%' AND post_text LIKE '%[img]<URL%'"
+# rx:    /\[img\]<URL url=\"(.+?)\">.+?<\/URL>\[\/img\]/i
+# 
+# where: "post_text LIKE '<r>%' AND post_text LIKE '%</LINK_TEXT>[/img]%'"
+# rx:    /\[img\]<LINK_TEXT .+?>(.+?)<\/LINK_TEXT>\[\/img\]/i
+# 
+# where: "post_text LIKE '<r>%' AND post_text LIKE '%</LINK_TEXT>[/IMG]<e>[/URL]</e></URL>%'"
+# rx:    /<URL .+?><s>\[URL .+?\]<\/s>\[IMG\]<LINK_TEXT .+?>(http.+?)<\/LINK_TEXT>\[\/IMG\]<e>\[\/URL\]<\/e><\/URL>/i
+
 
   def replace_in_posts(where,rx,repl)
     counter = 0
@@ -125,7 +131,7 @@ module X2P
       txt.gsub!(rx, repl)
       if txt != h['post_text']
         q = "UPDATE sm_posts SET post_text = #{sanitize(txt)} WHERE post_id = #{h['post_id']}"
-        puts q
+        puts "Post \e[32m#{h['post_id']}\e[0m Query: #{q}\n\n" if counter % 10 == 0 
         PHPBB_DB.query(q)
         counter += 1
       end
@@ -165,5 +171,7 @@ module X2P
   end
 end
 
-#<a href="./download/file.php?id={NUMBER}&amp;mode=view"><img src="./download/file.php?id={NUMBER}&amp;t=1" class="postimage" alt="DSCN0675.JPG" title="DSCN0675.JPG (1.79 MiB) Viewed 26 times"></a>
-#[img]<URL url=\"http://i1329.photobucket.com/albums/w541/mmpchem/photo_zps291c1ad8.jpg\"><LINK_TEXT text=\"http://i1329.photobucket.com/albums/w54 ... 1c1ad8.jpg\">http://i1329.photobucket.com/albums/w541/mmpchem/photo_zps291c1ad8.jpg</LINK_TEXT></URL>[/img]
+# <a href="./download/file.php?id={NUMBER}&amp;mode=view"><img src="./download/file.php?id={NUMBER}&amp;t=1" class="postimage" alt="DSCN0675.JPG" title="DSCN0675.JPG (1.79 MiB) Viewed 26 times"></a>
+# [img]<URL url=\"http://i1329.photobucket.com/albums/w541/mmpchem/photo_zps291c1ad8.jpg\"><LINK_TEXT text=\"http://i1329.photobucket.com/albums/w54 ... 1c1ad8.jpg\">http://i1329.photobucket.com/albums/w541/mmpchem/photo_zps291c1ad8.jpg</LINK_TEXT></URL>[/img]
+# <URL url=\"http://s454.photobucket.com/user/Arkoma_USA/media/digizooms/104_0014.jpg.html\"><s>[URL=http://s454.photobucket.com/user/Arkoma_USA/media/digizooms/104_0014.jpg.html]</s>[IMG]<LINK_TEXT text=\"http://i454.photobucket.com/albums/qq26 ... 4_0014.jpg\">http://i454.photobucket.com/albums/qq261/Arkoma_USA/digizooms/th_104_0014.jpg</LINK_TEXT>[/IMG]<e>[/URL]</e></URL>
+# /<URL .+?><s>\[URL .+?\]<\/s>\[IMG\]<LINK_TEXT .+?>(http.+?)<\/LINK_TEXT>\[\/IMG\]<e>\[\/URL\]<\/e><\/URL>/i
