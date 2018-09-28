@@ -107,6 +107,23 @@ module X2P
     end
   end
 
+  def bb2rx(tag)
+    return "<#{tag.upcase}.*?><s>[#{tag}.*?]</s>
+    [/img]<e>[/url]</e></URL>"
+
+  def replace_in_posts(where,rx,repl)
+    ar = PHPBB_DB.query("SELECT post_id, post_text FROM sm_posts WHERE #{where}").to_a
+    ar.each do |h|
+      txt = h['post_text'].dup
+      txt.gsub!(rx, rep)
+      if txt != h['post_text']
+        q = "UPDATE sm_posts SET post_text = #{sanitize(txt)} WHERE post_id = #{h['post_id']}"
+        puts q
+        PHPBB_DB.query(q)
+      end
+    end
+  end
+
   def fix_bbcode(text)
     txt = text.dup
     bb = txt.scan(UNPROCESSED_RX).flatten.compact
@@ -140,3 +157,4 @@ module X2P
 end
 
 #<a href="./download/file.php?id={NUMBER}&amp;mode=view"><img src="./download/file.php?id={NUMBER}&amp;t=1" class="postimage" alt="DSCN0675.JPG" title="DSCN0675.JPG (1.79 MiB) Viewed 26 times"></a>
+#[img]<URL url=\"http://i1329.photobucket.com/albums/w541/mmpchem/photo_zps291c1ad8.jpg\"><LINK_TEXT text=\"http://i1329.photobucket.com/albums/w54 ... 1c1ad8.jpg\">http://i1329.photobucket.com/albums/w541/mmpchem/photo_zps291c1ad8.jpg</LINK_TEXT></URL>[/img]
