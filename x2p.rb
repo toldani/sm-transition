@@ -111,11 +111,17 @@ module X2P
 #    return "<#{tag.upcase}.*?><s>[#{tag}.*?]</s>
 #    [/img]<e>[/url]</e></URL>"
 
+# "post_text LIKE '<r>%' AND post_text LIKE '%[/img]<e>[/url]</e></URL>%'"
+
+# where: "post_text LIKE '<r>%' AND post_text LIKE '%[img]<URL%'"
+# rx:    /\[img\]<URL url=\"(.+?)\">*.<\/URL>\[\/img\]/
+# repl:  "<IMG src=\"\\1\"><s>[img]</s><URL url=\"\\1\">\\1</URL><e>[/img]</e></IMG>"
+
   def replace_in_posts(where,rx,repl)
     ar = PHPBB_DB.query("SELECT post_id, post_text FROM sm_posts WHERE #{where}").to_a
     ar.each do |h|
       txt = h['post_text'].dup
-      txt.gsub!(rx, rep)
+      txt.gsub!(rx, repl)
       if txt != h['post_text']
         q = "UPDATE sm_posts SET post_text = #{sanitize(txt)} WHERE post_id = #{h['post_id']}"
         puts q
