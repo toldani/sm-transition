@@ -118,6 +118,7 @@ module X2P
 # repl:  "<IMG src=\"\\1\"><s>[img]</s><URL url=\"\\1\">\\1</URL><e>[/img]</e></IMG>"
 
   def replace_in_posts(where,rx,repl)
+    counter = 0
     ar = PHPBB_DB.query("SELECT post_id, post_text FROM sm_posts WHERE #{where}").to_a
     ar.each do |h|
       txt = h['post_text'].dup
@@ -126,8 +127,10 @@ module X2P
         q = "UPDATE sm_posts SET post_text = #{sanitize(txt)} WHERE post_id = #{h['post_id']}"
         puts q
         PHPBB_DB.query(q)
+        counter += 1
       end
     end
+    puts "#{counter} replacements performed."
   end
 
   def fix_bbcode(text)
