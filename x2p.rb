@@ -169,9 +169,15 @@ module X2P
     
     return bb.empty? ? nil : txt
   end
+
+  def unescape(text)
+    return CGI.unescape_html(text).gsub(/\\(?=['"])/, '')
+  end
 end
 
 # <a href="./download/file.php?id={NUMBER}&amp;mode=view"><img src="./download/file.php?id={NUMBER}&amp;t=1" class="postimage" alt="DSCN0675.JPG" title="DSCN0675.JPG (1.79 MiB) Viewed 26 times"></a>
 # [img]<URL url=\"http://i1329.photobucket.com/albums/w541/mmpchem/photo_zps291c1ad8.jpg\"><LINK_TEXT text=\"http://i1329.photobucket.com/albums/w54 ... 1c1ad8.jpg\">http://i1329.photobucket.com/albums/w541/mmpchem/photo_zps291c1ad8.jpg</LINK_TEXT></URL>[/img]
 # <URL url=\"http://s454.photobucket.com/user/Arkoma_USA/media/digizooms/104_0014.jpg.html\"><s>[URL=http://s454.photobucket.com/user/Arkoma_USA/media/digizooms/104_0014.jpg.html]</s>[IMG]<LINK_TEXT text=\"http://i454.photobucket.com/albums/qq26 ... 4_0014.jpg\">http://i454.photobucket.com/albums/qq261/Arkoma_USA/digizooms/th_104_0014.jpg</LINK_TEXT>[/IMG]<e>[/URL]</e></URL>
 # /<URL .+?><s>\[URL .+?\]<\/s>\[IMG\]<LINK_TEXT .+?>(http.+?)<\/LINK_TEXT>\[\/IMG\]<e>\[\/URL\]<\/e><\/URL>/i
+# http://i454.photobucket.com/albums/qq261/Arkoma_USA/celestron/th_2012-10-09-034404.jpg
+# http://i454.photobucket.com/albums/qq261/Arkoma_USA/celestron/2012-10-09-034404.jpg

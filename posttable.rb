@@ -3,7 +3,7 @@ require './sm_transition.rb'
 # has special methods unique to post tables
 class PostTable < SQLTable
 
-	# given an id for an XMB forum, return the columns and values in phpBB format using XMB data
+	# given a thread id, return all the posts in that thread converted for phpBB
 	def to_phpbb(tid)
 
 		# if post.is_a?(Hash)

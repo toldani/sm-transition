@@ -1,0 +1,4 @@
+# Put users into the "registered users" group if they don't already have a group
+
+ar = PHPBB_DB.query("SELECT user_id FROM sm_users WHERE user_id NOT IN (SELECT user_id FROM sm_user_group)").to_a.map {|u| u['user_id']}
+ar.each {|u| PHPBB_DB.query("INSERT INTO sm_user_group (group_id, user_id) VALUES (2, #{u})")}
