@@ -1,12 +1,22 @@
 module X2P
 
   # The XMB database, running in a virtual machine.  Port forwarding is set up to allow communication
-  XMB_DB = Mysql2::Client.new(host: "127.0.0.1", username: "root", password: "science", port: 3333, database: "science_xmb1")
-  XMB_TABLES = XMB_DB.query("SHOW TABLES").to_a.map {|h| h.flatten[1]} # array of xmb table names
+  XMB_DB = Mysql2::Client.new(host: "127.0.0.1", username: "root", password: "science", port: 3333, database: "science_xmb1", connect_timeout: 3) rescue nil
+  
+  if XMB_DB
+    XMB_TABLES = XMB_DB.query("SHOW TABLES").to_a.map {|h| h.flatten[1]} # array of xmb table names
+  else
+    puts "XMB database unable to connect, continuing anyway."
+  end
 
   # The phpBB database, running on the local non-virtual machine.
-  PHPBB_DB = Mysql2::Client.new(host: "127.0.0.1", username: "sm", password: "science", port: 3306, database: "sm_phpbb")
-  PHPBB_TABLES = PHPBB_DB.query("SHOW TABLES").to_a.map {|h| h.flatten[1]} # array of phpbb table names
+  PHPBB_DB = Mysql2::Client.new(host: "127.0.0.1", username: "sm", password: "science", port: 3306, database: "sm_phpbb", connect_timeout: 3) rescue nil
+
+  if PHPBB_DB
+    PHPBB_TABLES = PHPBB_DB.query("SHOW TABLES").to_a.map {|h| h.flatten[1]} # array of phpbb table names
+  else
+    puts "phpBB database unable to connect, continuing anyway."
+  end
 
   # A hash mapping XMB forums numbers to their phpbb counterparts
   X2P_FID = {2=>5, 11=>21, 3=>12, 13=>1, 5=>7, 6=>9, 7=>18, 9=>11, 10=>6, 12=>8, 14=>3, 15=>13, 16=>4,

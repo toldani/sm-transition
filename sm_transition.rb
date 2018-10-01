@@ -27,23 +27,27 @@ class TrueClass; def to_i; 1 end end
 @table_class.merge!("users" => UserTable, "members" => UserTable, "posts" => PostTable, "attachments" => AttachmentTable, "threads" => ThreadTable)
 
 # Automatically initialize a SQLTable object for each table in the XMB db
-XMB = {}
-XMB_TABLES.each do |t|
-	n = t[/(?<=xmb_).+/]
-  xt = @table_class[n].new(t)
-  next if xt.count.nil? || xt.count == 0
-  puts "Building XMB['#{n}'] ... #{xt.count} rows"
-	XMB[n] = xt
-  XMB.define_singleton_method(n.to_sym) { self.fetch(n) }
+if XMB_DB
+  XMB = {}
+  XMB_TABLES.each do |t|
+  	n = t[/(?<=xmb_).+/]
+    xt = @table_class[n].new(t)
+    next if xt.count.nil? || xt.count == 0
+    puts "Building XMB['#{n}'] ... #{xt.count} rows"
+  	XMB[n] = xt
+    XMB.define_singleton_method(n.to_sym) { self.fetch(n) }
+  end
 end
 
 # Automatically initialize a SQLTable object for each table in the PHPBB db
-PHPBB = {}
-PHPBB_TABLES.each do |t|
-	n = t[/(?<=sm_).+/]
-  puts "Building PHPBB['#{n}'] ..."
-	PHPBB[n] = @table_class[n].new(t)
-  PHPBB.define_singleton_method(n.to_sym) { self.fetch(n) }
+if PHPBB_DB
+  PHPBB = {}
+  PHPBB_TABLES.each do |t|
+  	n = t[/(?<=sm_).+/]
+    puts "Building PHPBB['#{n}'] ..."
+  	PHPBB[n] = @table_class[n].new(t)
+    PHPBB.define_singleton_method(n.to_sym) { self.fetch(n) }
+  end
 end
 
 
