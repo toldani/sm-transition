@@ -1,7 +1,7 @@
 module X2P
 
   # The XMB database, running in a virtual machine.  Port forwarding is set up to allow communication
-  XMB_DB = Mysql2::Client.new(host: "127.0.0.1", username: "root", password: "science", port: 3333, database: "science_xmb1", connect_timeout: 3) rescue nil
+  XMB_DB = Mysql2::Client.new(host: "127.0.0.1", username: "root", password: "science", port: 3307, database: "science_xmb1", connect_timeout: 3) rescue nil
   
   if XMB_DB
     XMB_TABLES = XMB_DB.query("SHOW TABLES").to_a.map {|h| h.flatten[1]} # array of xmb table names
