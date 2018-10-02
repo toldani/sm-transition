@@ -30,6 +30,10 @@ class SQLTable
     return h
   end
 
+  def get_column(c)
+  	@db.query("SELECT #{c} FROM #{@table_name}").to_a.map {|x| x[c]}
+  end
+
 	# puts some default values in the initial hash that's used as a template for inserting rows
 	def default_row
 		if @default_row.nil?
