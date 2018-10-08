@@ -9,6 +9,7 @@ require 'mysql2' # Ruby MySQL interface gem
 require 'fileutils' # File utilities
 require 'cgi' # Misc. network functions
 require 'yaml' # useful for text parsing and other things
+require 'bb-ruby' # parse bbcode tags in ruby
 
 require './x2p.rb'
 include X2P
