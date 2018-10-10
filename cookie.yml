@@ -1,0 +1,13 @@
+--- !ruby/object:HTTP::Cookie
+name: xmbpw
+value: 7da663d74b0e900bb5e7dfee120a789c
+domain: sciencemadness.org
+for_domain: true
+path: "/talk/"
+secure: false
+httponly: true
+expires: 
+max_age: 2592000
+created_at: 2018-10-09 04:40:44.185130301 -04:00
+accessed_at: 2018-10-09 10:02:58.145730711 -04:00
+

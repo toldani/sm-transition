@@ -1,6 +1,6 @@
-SIZE_MAP = 
+# 
 
-{
+BBCODE_MAP =  {
   "Bold"=>
     [/\[b(:.*)?\](.*?)\[\/b\1?\]/mi,
       "<B><s>[b]</s>\\2<e>[/b]</e></B>",
@@ -73,6 +73,12 @@ SIZE_MAP =
       "Quote",
       "[quote]Now is the time...[/quote]",
       :quote],
+  "RQuote"=>
+    [/\[rquote\=(\d+)&amp;tid=\d+&amp;author=(.*?)\](.*?)\[\/rquote\]/mi,
+      "<QUOTE author=\"\\2\" post_id=\"\\1\" time=\"@time@\" user_id=\"@uid@\"><s>[quote=\\2 post_id=\\1 time=@time@ user_id=@uid@]</s>\\3<e>[/quote]</e></QUOTE>",
+      "XMB rquote tag, like quote tag but with more info",
+      "[rquote=451651&amp;tid=66461&amp;author=Melgar]how 2 make p2p?[/rquote]",
+      :rquote],
   "Link"=>
     [/\[url=(?:&quot;)?(.*?)(?:&quot;)?\](.*?)\[\/url\]/mi,
       "<URL url=\"\\1\"><s>[url]</s>\\2<e>[/url]</e></URL>",
@@ -91,69 +97,10 @@ SIZE_MAP =
       "Display an image",
       "Check out this crazy cat: [img]http://catsweekly.com/crazycat.jpg[/img]",
       :image],
-  "YouTube"=>
-    [/\[youtube\](.*?)\?v=([\w\d\-]+).*?\[\/youtube\]/mi,
-      "<iframe id=\"ytplayer\" type=\"text/html\" width=\"640\" height=\"390\" src=\"//youtube.com/embed/\\2\" frameborder=\"0\"></iframe>",
-      "Display a video from YouTube.com",
-      "[youtube]http://youtube.com/watch?v=E4Fbk52Mk1w[/youtube]",
-      :video],
-  "YouTube (Alternative)"=>
-    [/\[youtube\](.*?)\/v\/([\w\d\-]+)\[\/youtube\]/mi,
-      "<iframe id=\"ytplayer\" type=\"text/html\" width=\"640\" height=\"390\" src=\"//youtube.com/embed/\\2\" frameborder=\"0\"></iframe>",
-      "Display a video from YouTube.com (alternative format)",
-      "[youtube]http://youtube.com/watch/v/E4Fbk52Mk1w[/youtube]",
-      :video],
-  "Vimeo"=>
-    [/\[vimeo\](.*?)\/(\d+)\[\/vimeo\]/mi,
-      "<iframe src=\"//player.vimeo.com/video/\\2\" width=\"640\" height=\"390\" frameborder=\"0\" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>",
-      "Display a video from Vimeo",
-      "[vimeo]http://www.vimeo.com/3485239[/vimeo]",
-      :video],
-  "Google Video"=>
-    [/\[gvideo\](.*?)\?docid=([-]{0,1}\d+).*\[\/gvideo\]/mi,
-      "<embed style=\"width:400px; height:326px;\" id=\"VideoPlayback\" type=\"application/x-shockwave-flash\" src=\"http://video.google.com/googleplayer.swf?docId=\\2\" flashvars=\"\"> </embed>",
-      "Display a video from Google Video",
-      "[gvideo]http://video.google.com/videoplay?docid=-2200109535941088987[/gvideo]",
-      :video],
-  "Email"=>
-    [/\[email[^:=]?\](((?!\[\/email\]).)*)\[\/email\]/mi,
-      "<a href=\"mailto:\\1\">\\1</a>",
-      "Link to email address",
-      "[email]wadus@wadus.com[/email]",
-      :email],
-  "Email (alternative)"=>
-    [/\[email[:=]([^\]]+)\](((?!\[\/email\]).)*)(\[\/email\1?\])?/mi,
-      "<a href=\"mailto:\\1\">\\2</a>",
-      "Link to email address",
-      "[email:wadus@wadus.com]Email Me[/email]",
-      :email],
   "Align"=>
-    [/\[align=(.*?)\](.*?)\[\/align\]/mi,
-      "<span class=\"bb-ruby_align_\\1\" style=\"float:\\1;\">\\2</span>",
+    [/\[align=(left|right|center)\](.*?)\[\/align\]/mi,
+      "<ALIGN align=\"\\1\"><s>[align=\\1]>/s>\\2<e>[/align]</e></ALIGN>",
       "Align this object using float",
       "Here's a wrapped image: [align=right][img]image.png[/img][/align]",
-      :align],
-  "Left"=>    
-    [/\[left(:.+)?\](.*?)\[\/left\1?\]/mi,
-      "<div style=\"text-align: left;\">\\2</div>",
-      "Aligns contents along the left side",
-      "[left]Left-aligned content[/left]",
-      :left],
-  "Center"=>
-    [/\[center(:.+)?\](.*?)\[\/center\1?\]/mi,
-      "<div style=\"text-align: center;\">\\2</div>",
-      "Aligns contents on the center",
-      "[center]Centered content[/center]",
-      :center],
-  "Right"=>
-    [/\[right(:.+)?\](.*?)\[\/right\1?\]/mi,
-      "<div style=\"text-align: right;\">\\2</div>",
-      "Aligns contents along the right side",
-      "[right]Right-aligned content[/right]",
-      :right],
-  "Line break"=>
-    [/\[br\]/mi,
-      "<br />",
-      "Inserts line break tag",
-      "One[br]Two[br]Three lines!",
-      :br]}
+      :align]
+  }

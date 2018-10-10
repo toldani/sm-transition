@@ -2,3 +2,26 @@
 
 ar = PHPBB_DB.query("SELECT user_id FROM sm_users WHERE user_id NOT IN (SELECT user_id FROM sm_user_group)").to_a.map {|u| u['user_id']}
 ar.each {|u| PHPBB_DB.query("INSERT INTO sm_user_group (group_id, user_id) VALUES (2, #{u})")}
+
+print "Username? "
+u = gets.chop
+print "Password? "
+p = gets.chop
+
+page = botkilla.get("http://www.sciencemadness.org/talk/")
+f = page.form
+f.field_with(:name => "username").value = u
+f.field_with(:name => "password").value = p
+f.submit
+end
+
+Set-Cookie: xmblva=1539064941; expires=Wed, 09-Oct-2019 06:02:21 GMT; Max-Age=31536000; path=/talk/; domain=.sciencemadness.org; httponly
+Set-Cookie: xmblvb=1539057183; expires=Tue, 09-Oct-2018 06:12:21 GMT; Max-Age=600; path=/talk/; domain=.sciencemadness.org; httponly
+Set-Cookie: xmbuser=Melgar; expires=Thu, 08-Nov-2018 06:02:21 GMT; Max-Age=2592000; path=/talk/; domain=.sciencemadness.org; httponly
+Set-Cookie: xmbpw=7da663d74b0e900bb5e7dfee120a789c; expires=Thu, 08-Nov-2018 06:02:21 GMT; Max-Age=2592000; path=/talk/; domain=.sciencemadness.org; httponly
+
+
+Mechanize::Cookie.parse(l, "Set-Cookie: xmblva=1539064941; expires=Wed, 09-Oct-2019 06:02:21 GMT; Max-Age=31536000; path=/talk/; domain=.sciencemadness.org; httponly")
+Mechanize::Cookie.parse(l, "Set-Cookie: xmblvb=1539057183; expires=Tue, 09-Oct-2018 06:12:21 GMT; Max-Age=600; path=/talk/; domain=.sciencemadness.org; httponly")
+Mechanize::Cookie.parse(l, "Set-Cookie: xmbuser=Melgar; expires=Thu, 08-Nov-2018 06:02:21 GMT; Max-Age=2592000; path=/talk/; domain=.sciencemadness.org; httponly")
+Mechanize::Cookie.parse(l, "Set-Cookie: xmbpw=7da663d74b0e900bb5e7dfee120a789c; expires=Thu, 08-Nov-2018 06:02:21 GMT; Max-Age=2592000; path=/talk/; domain=.sciencemadness.org; httponly")
