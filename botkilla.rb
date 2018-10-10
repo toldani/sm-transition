@@ -110,26 +110,26 @@ def kill_spam(ar)
     if users.keys.include? h['username']
       if (Time.now - users[h['username']]['reg_date']) / 3600 < 36 
         h['spam_score'] = h['spam_score'].to_i + 5
-        h['flags'] = h['flags'].to_a + ['registered yesterday']
+        h['flags'] = h['flags'].to_a + ['registered since yesterday']
       else
         h['spam_score'] = h['spam_score'].to_i + 3
         h['flags'] = h['flags'].to_a + ['registered recently']
       end
     end
 
-    h['thread_text'] = open(@uri.to_s + h['link']).read.split(/<font class=\"subject\">.*?<\/font>/m)[1]
-    h['thread_text'] = h['thread_text'].to_s[/(?<=<font class=\"mediumtxt\">).*?(?=<\/font>\s{1,10}<\/td>)/m]
-
+    # scan the text of a post for links, then determine if they're appropriate links for this site
+    @botkilla.get(@uri.to_s + h['link'])
+    h['thread_text'] = @botkilla.page.xpath("//td[@style='height: 80px; width: 82%']/font")[1].text
     domains = h['thread_text'].to_s.scan(/https?:\/\/([\w\.-]+)/)
-
     verdict = domains.group_by {|d| POPULAR_DOMAINS.include?(d)}
 
     # number of links to unrecognized domains that were posted
     if verdict[true].to_a.length < verdict[false].to_a.length
-      h['spam_score'] = h['spam_score'].to_i + verdict[false].to_a.length
-      h['flags'] = h['flags'].to_a + ['linking to an unrecognized domain multiple times']
+      h['spam_score'] = h['spam_score'].to_i + 5
+      h['flags'] = h['flags'].to_a + ['linking to an unrecognized domain']
     end
 
+    # 
     if h['spam_score'].to_i > 6 && h['tid'] > @tid_cutoff
       puts h
       puts "Spam score is #{h['spam_score']}. Deleting it..."
