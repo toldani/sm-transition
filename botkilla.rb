@@ -1,12 +1,12 @@
 require 'mechanize'
-require 'logger'
+#require 'logger'
 require 'open-uri'
 
 START_THREAD_CUTOFF = 96000
 POPULAR_DOMAINS = open("sm-linked-domains.txt").read.split("\n")
 
-@log = Logger.new "/home/tom/workspace/mechlog.txt"
-@log.level = Logger::DEBUG
+#@log = Logger.new "/home/tom/workspace/mechlog.txt"
+#@log.level = Logger::DEBUG
 
 @uri = URI("http://www.sciencemadness.org/talk/")
 
@@ -16,7 +16,7 @@ POPULAR_DOMAINS = open("sm-linked-domains.txt").read.split("\n")
 puts "Password?"
 @password = gets.chop
 
-@botkilla = Mechanize.new {|a| a.log = @log}
+@botkilla = Mechanize.new # {|a| a.log = @log}
 
 @botkilla.user_agent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/69.0.3497.81 Chrome/69.0.3497.81 Safari/537.36"
 
