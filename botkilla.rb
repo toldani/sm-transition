@@ -24,6 +24,8 @@ puts "Password?"
 
 @login_form = @botkilla.page.forms.first
 
+@checked_threads = []
+
 @login_form.field_with(:name => "username").value = @username
 @login_form.field_with(:name => "password").value = @password
 
@@ -54,7 +56,8 @@ def posts_today
     h = {}
     begin
       # pull link and title out of the nested Nokogiri mess
-      h['link'] = cells[2].children.children[1].attributes['href'].value
+      attributes = cells[2].children.children[1].attributes
+      h['link'] = attributes['href'].value
       h['title'] = cells[2].children.children[1].children.first.text
       h['username'] = cells[3].children.first.children.text
       h['replies'] = cells[5].children.children.text.to_i
@@ -63,7 +66,7 @@ def posts_today
       h['last_poster'] = q.text
       h['tid'] = h['link'][/(?<=tid=)\d+/].to_i
     rescue => e
-      puts e
+      puts "#{e}   attributes: #{attributes}"
       next
     end
     ar << h
@@ -95,10 +98,14 @@ def kill_spam(ar)
   users = users.to_h
 
   ar.each do |h|
+    next if @checked_threads.include?(h['tid'])
     # If the title contains words common in spam titles
-    if h['title'][/(\p{C}|adult|galleries|unencumbered|mature)/]
-      h['spam_score'] = h['spam_score'].to_i + 7
+    if h['title'][/(adult|galleries|unencumbered|mature)/]
+      h['spam_score'] = h['spam_score'].to_i + 6
       h['flags'] = h['flags'].to_a + ['spam words in title']
+    elsif h['title'][/\p{C}/]
+      h['spam_score'] = h['spam_score'].to_i + 7
+      h['flags'] = h['flags'].to_a + ['strange characters in title']
     end
 
     # if the list of most recently registered users includes the user in question, add
@@ -131,6 +138,8 @@ def kill_spam(ar)
       puts "Spam score is #{h['spam_score']}. Deleting it..."
       #x = gets.chop
       delete_thread(h) #if x.downcase == "y"
+    else
+      @checked_threads << h['tid']
     end
   end
 end
