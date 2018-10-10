@@ -51,22 +51,19 @@ def posts_today
   @botkilla.get(@uri.to_s + "today.php")
   ar = []
 
-  @botkilla.page.search("tr.tablerow").each do |tr|
-    cells = tr.search("td")
+  @botkilla.page.xpath("//tr[@class='tablerow']").each do |tr|
     h = {}
     begin
       # pull link and title out of the nested Nokogiri mess
-      attributes = cells[2].children.children[1].attributes
-      h['link'] = attributes['href'].value
-      h['title'] = cells[2].children.children[1].children.first.text
-      h['username'] = cells[3].children.first.children.text
-      h['replies'] = cells[5].children.children.text.to_i
-      q = cells[7]
-      6.times { q = q.children }
-      h['last_poster'] = q.text
+      title_cell = tr.at_xpath("./td[@width='43%']/font/a")
+      h['link'] = title_cell['href']
+      h['title'] = title_cell.text
+      h['username'] = tr.at_xpath("./td[@width='14%']/a").text
+      h['replies'] = tr.xpath("./td[@width='5%']/font").first.text.to_i
+      h['last_poster'] = tr.at_xpath("./td[@width='23%']/table/tr/td/font/a").text
       h['tid'] = h['link'][/(?<=tid=)\d+/].to_i
     rescue => e
-      puts "#{e}   attributes: #{attributes}"
+      puts e
       next
     end
     ar << h
@@ -100,7 +97,7 @@ def kill_spam(ar)
   ar.each do |h|
     next if @checked_threads.include?(h['tid'])
     # If the title contains words common in spam titles
-    if h['title'][/(adult|galleries|unencumbered|mature)/]
+    if h['title'][/(sex|passionate|adult|galleries|unencumbered|mature)/]
       h['spam_score'] = h['spam_score'].to_i + 6
       h['flags'] = h['flags'].to_a + ['spam words in title']
     elsif h['title'][/\p{C}/]
