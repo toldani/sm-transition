@@ -106,7 +106,7 @@ def kill_spam(ar)
     end
 
     # if the list of most recently registered users includes the user in question, add
-    # 5 points for registereing in the last 36 hours, 2 points oherwise.
+    # 5 points for registereing in the last 36 hours, 3 points oherwise.
     if users.keys.include? h['username']
       if (Time.now - users[h['username']]['reg_date']) / 3600 < 36 
         h['spam_score'] = h['spam_score'].to_i + 5
@@ -119,7 +119,7 @@ def kill_spam(ar)
 
     # scan the text of a post for links, then determine if they're appropriate links for this site
     @botkilla.get(@uri.to_s + h['link'])
-    h['thread_text'] = @botkilla.page.xpath("//td[@style='height: 80px; width: 82%']/font")[1].text
+    h['thread_text'] = @botkilla.page.xpath("//td[@class='tablerow' and @valign='top' and @style='height: 80px; width: 82%']/font")[1].text
     domains = h['thread_text'].to_s.scan(/https?:\/\/([\w\.-]+)/)
     verdict = domains.group_by {|d| POPULAR_DOMAINS.include?(d)}
 
