@@ -98,10 +98,10 @@ def kill_spam(ar)
     next if @checked_threads.include?(h['tid'])
     # If the title contains words common in spam titles
     if h['title'][/(sex|passionate|adult|galleries|unencumbered|mature)/]
-      h['spam_score'] = h['spam_score'].to_i + 6
+      h['spam_score'] = h['spam_score'].to_i + 5
       h['flags'] = h['flags'].to_a + ['spam words in title']
     elsif h['title'][/\p{C}/]
-      h['spam_score'] = h['spam_score'].to_i + 7
+      h['spam_score'] = h['spam_score'].to_i + 5
       h['flags'] = h['flags'].to_a + ['strange characters in title']
     end
 
@@ -120,7 +120,7 @@ def kill_spam(ar)
     # scan the text of a post for links, then determine if they're appropriate links for this site
     @botkilla.get(@uri.to_s + h['link'])
     h['thread_text'] = @botkilla.page.xpath("//td[@class='tablerow' and @valign='top' and @style='height: 80px; width: 82%']/font")[1].text
-    domains = h['thread_text'].to_s.scan(/https?:\/\/([\w\.-]+)/)
+    domains = h['thread_text'].to_s.scan(/https?:\/\/([\w\.-]+)/).flatten
     verdict = domains.group_by {|d| POPULAR_DOMAINS.include?(d)}
 
     # number of links to unrecognized domains that were posted
