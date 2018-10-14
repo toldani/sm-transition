@@ -78,9 +78,9 @@ def new_posts
 end
 
 def delete_thread(h)
-  @botkilla.get("http://www.sciencemadness.org/talk/topicadmin.php?tid=#{h['tid']}&action=delete")
-  @botkilla.page.forms.first.click_button
   begin
+    @botkilla.get("http://www.sciencemadness.org/talk/topicadmin.php?tid=#{h['tid']}&action=delete")
+    @botkilla.page.forms.first.click_button
     puts "Deleted thread with title '#{h['title']}' for #{h['flags'].join(', ')}."
   rescue => e
     puts e
