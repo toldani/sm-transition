@@ -1,6 +1,7 @@
 require 'mechanize'
 #require 'logger'
 require 'open-uri'
+require 'yaml'
 
 START_THREAD_CUTOFF = 96000
 POPULAR_DOMAINS = open("sm-linked-domains.txt").read.split("\n")
@@ -23,6 +24,8 @@ puts "Password?"
 @botkilla.get("http://www.sciencemadness.org/talk/misc.php?action=login")
 
 @login_form = @botkilla.page.forms.first
+
+@last_error = ""
 
 @checked_threads = []
 
@@ -63,7 +66,12 @@ def posts_today
       h['last_poster'] = tr.at_xpath("./td[@width='23%']/table/tr/td/font/a").text
       h['tid'] = h['link'][/(?<=tid=)\d+/].to_i
     rescue => e
-      puts e
+      if @last_error == e.to_s
+        print "."
+      else
+        @last_error = e.to_s
+        print e.to_s
+      end
       next
     end
     ar << h
@@ -97,7 +105,7 @@ def kill_spam(ar)
   ar.each do |h|
     next if @checked_threads.include?(h['tid'])
     # If the title contains words common in spam titles
-    if h['title'][/(sex|passionate|adult|galleries|unencumbered|mature)/]
+    if h['title'][/(sex|passionate|adult|galleries|unencumbered|mature|callow)/i]
       h['spam_score'] = h['spam_score'].to_i + 5
       h['flags'] = h['flags'].to_a + ['spam words in title']
     elsif h['title'][/\p{C}/]
@@ -130,8 +138,10 @@ def kill_spam(ar)
     end
 
     # 
-    if h['spam_score'].to_i > 6 && h['tid'] > @tid_cutoff
-      puts h
+    if h['spam_score'].to_i > 8 && h['tid'] > @tid_cutoff
+      @last_error = ""
+      puts "\n\n"
+      puts h.to_yaml
       puts "Spam score is #{h['spam_score']}. Deleting it..."
       #x = gets.chop
       delete_thread(h) #if x.downcase == "y"
@@ -142,7 +152,3 @@ def kill_spam(ar)
 end
 
 
-
-
-
-   
