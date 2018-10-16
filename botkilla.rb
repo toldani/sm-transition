@@ -105,7 +105,7 @@ def kill_spam(ar)
   ar.each do |h|
     next if @checked_threads.include?(h['tid'])
     # If the title contains words common in spam titles
-    if h['title'][/(sex|passionate|adult|galleries|unencumbered|mature|callow)/i]
+    if h['title'][/(sex|passionate|adult|galleries|unencumbered|mature|callow|passports)/i]
       h['spam_score'] = h['spam_score'].to_i + 5
       h['flags'] = h['flags'].to_a + ['spam words in title']
     elsif h['title'][/\p{C}/]
