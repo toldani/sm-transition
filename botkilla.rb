@@ -1,9 +1,11 @@
+# encoding: ISO-8859-1
+
 require 'mechanize'
 #require 'logger'
 require 'open-uri'
 require 'yaml'
 
-START_THREAD_CUTOFF = 96000
+START_THREAD_CUTOFF = 98000
 POPULAR_DOMAINS = open("sm-linked-domains.txt").read.split("\n")
 
 #@log = Logger.new "/home/tom/workspace/mechlog.txt"
@@ -133,7 +135,7 @@ def kill_spam(ar)
 
     # number of links to unrecognized domains that were posted
     if verdict[true].to_a.length < verdict[false].to_a.length
-      h['spam_score'] = h['spam_score'].to_i + 5
+      h['spam_score'] = h['spam_score'].to_i + 6
       h['flags'] = h['flags'].to_a + ['linking to an unrecognized domain']
     end
 
