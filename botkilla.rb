@@ -110,7 +110,7 @@ def kill_spam(ar)
     if h['title'][/(sex|passionate|adult|galleries|unencumbered|mature|callow|casino|passports)/i]
       h['spam_score'] = h['spam_score'].to_i + 5
       h['flags'] = h['flags'].to_a + ['spam words in title']
-    elsif h['title'][/\p{Cyrillic}/]
+    elsif h['title'][/[^\p{ASCII}]/]
       h['spam_score'] = h['spam_score'].to_i + 5
       h['flags'] = h['flags'].to_a + ['strange characters in title']
     end
