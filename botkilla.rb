@@ -1,5 +1,3 @@
-# encoding: ISO-8859-1
-
 require 'mechanize'
 #require 'logger'
 require 'open-uri'
@@ -110,7 +108,7 @@ def kill_spam(ar)
     if h['title'][/(sex|passionate|adult|galleries|unencumbered|mature|callow|casino|passports)/i]
       h['spam_score'] = h['spam_score'].to_i + 5
       h['flags'] = h['flags'].to_a + ['spam words in title']
-    elsif h['title'][/[^\p{ASCII}]/]
+    elsif h['title'][/\p{C}/]
       h['spam_score'] = h['spam_score'].to_i + 5
       h['flags'] = h['flags'].to_a + ['strange characters in title']
     end
