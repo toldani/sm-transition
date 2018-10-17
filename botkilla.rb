@@ -62,7 +62,7 @@ def posts_today
       h['link'] = title_cell['href']
       h['title'] = title_cell.text
       h['username'] = tr.at_xpath("./td[@width='14%' and @bgcolor='#fffbe8']").text
-      h['replies'] = tr.xpath("./td[@width='5%']/font").first.text.to_i
+      h['replies'] = tr.xpath("./td[@width='5%']/font").text.to_i
       h['last_poster'] = tr.at_xpath("./td[@width='23%']/table/tr/td/font/a").text
       h['tid'] = h['link'][/(?<=tid=)\d+/].to_i
     rescue => e
@@ -127,7 +127,7 @@ def kill_spam(ar)
 
     # scan the text of a post for links, then determine if they're appropriate links for this site
     @botkilla.get(@uri.to_s + h['link']) rescue next
-    h['thread_text'] = @botkilla.page.xpath("//td[@class='tablerow' and @valign='top' and @style='height: 80px; width: 82%']/font")[1].text
+    h['thread_text'] = @botkilla.page.xpath("//td[@class='tablerow' and @valign='top' and @style='height: 80px; width: 82%']/font[@class='mediumtxt']").text
     domains = h['thread_text'].to_s.scan(/https?:\/\/([\w\.-]+)/).flatten
     verdict = domains.group_by {|d| POPULAR_DOMAINS.include?(d)}
 
