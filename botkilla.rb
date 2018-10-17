@@ -131,6 +131,16 @@ def kill_spam(ar)
     domains = h['thread_text'].to_s.scan(/https?:\/\/([\w\.-]+)/).flatten
     verdict = domains.group_by {|d| POPULAR_DOMAINS.include?(d)}
 
+    # checks to see if user is creating a poll for first post, or is submitting a link for first post
+    posts = @botkilla.page.xpath("//div[@class='smalltxt']").text[/(?<=Posts: )\d+/].to_i
+    if posts < 1
+      h['spam_score'] = h['spam_score'].to_i + 6
+      h['flags'] = h['flags'].to_a + ['poll as first post']
+    elsif posts == 1
+      h['spam_score'] = h['spam_score'].to_i + 3
+      h['flags'] = h['flags'].to_a + ['first post ever']
+    end
+
     # number of links to unrecognized domains that were posted
     if verdict[true].to_a.length < verdict[false].to_a.length
       h['spam_score'] = h['spam_score'].to_i + 6
