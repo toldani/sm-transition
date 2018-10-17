@@ -105,7 +105,7 @@ def kill_spam(ar)
   ar.each do |h|
     next if @checked_threads.include?(h['tid'])
     # If the title contains words common in spam titles
-    if h['title'][/(sex|passionate|adult|galleries|unencumbered|mature|callow|passports)/i]
+    if h['title'][/(sex|passionate|adult|galleries|unencumbered|mature|callow|casino|passports)/i]
       h['spam_score'] = h['spam_score'].to_i + 5
       h['flags'] = h['flags'].to_a + ['spam words in title']
     elsif h['title'][/\p{C}/]
@@ -126,7 +126,7 @@ def kill_spam(ar)
     end
 
     # scan the text of a post for links, then determine if they're appropriate links for this site
-    @botkilla.get(@uri.to_s + h['link'])
+    @botkilla.get(@uri.to_s + h['link']) rescue next
     h['thread_text'] = @botkilla.page.xpath("//td[@class='tablerow' and @valign='top' and @style='height: 80px; width: 82%']/font")[1].text
     domains = h['thread_text'].to_s.scan(/https?:\/\/([\w\.-]+)/).flatten
     verdict = domains.group_by {|d| POPULAR_DOMAINS.include?(d)}
