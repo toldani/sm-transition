@@ -116,6 +116,8 @@ def kill_spam(ar)
     elsif h['title'][/\p{C}/]
       h['spam_score'] = h['spam_score'].to_i + 5
       h['flags'] = h['flags'].to_a + ['strange characters in title']
+      puts "\e[1mBinary:\e[0m #{h['title'].force_encoding("BINARY")}" rescue "BINARY ERROR!"
+      puts "\e[1mUTF-8:\e[0m  #{h['title'].force_encoding("UTF-8").encode("ISO-8859-1").force_encoding("UTF-8")}" rescue "UTF-8 ERROR!"
     end
 
     # if the list of most recently registered users includes the user in question, add
