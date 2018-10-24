@@ -14,8 +14,10 @@ POPULAR_DOMAINS = open("sm-linked-domains.txt").read.split("\n")
 @tid_cutoff = START_THREAD_CUTOFF
 
 @username = "Melgar"
-puts "Password?"
+print "Password: \e[8m"
 @password = gets.chop
+@password.define_singleton_method(:inspect) { "[REDACTED]" }
+puts "\e[0m"
 
 @botkilla = Mechanize.new # {|a| a.log = @log}
 
@@ -43,12 +45,6 @@ class Nokogiri::XML::Element
 
   def great_grandchildren
     self.children.children.children
-  end
-
-  def descendents(n)
-    x = self
-    n.times { x = x.children }
-    return x
   end
 end
 
