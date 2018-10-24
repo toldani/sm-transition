@@ -107,13 +107,12 @@ def kill_spam(ar)
     next if @checked_threads.include?(h['tid'])
     # If the title contains words common in spam titles
     if h['title'][/(sex|passionate|adult|galleries|unencumbered|mature|callow|casino|passports)/i]
-      h['spam_score'] = h['spam_score'].to_i + 5
+      h['spam_score'] = h['spam_score'].to_i + 3
       h['flags'] = h['flags'].to_a + ['spam words in title']
     elsif h['title'][/\p{C}/]
-      h['spam_score'] = h['spam_score'].to_i + 5
+      h['spam_score'] = h['spam_score'].to_i + 3
       h['flags'] = h['flags'].to_a + ['strange characters in title']
-      puts "\e[1mBinary:\e[0m #{h['title'].force_encoding("BINARY")}" rescue "BINARY ERROR!"
-      puts "\e[1mUTF-8:\e[0m  #{h['title'].force_encoding("UTF-8").encode("ISO-8859-1").force_encoding("UTF-8")}" rescue "UTF-8 ERROR!"
+      h['title'] = h['title'].force_encoding("UTF-8").encode("ISO-8859-1").force_encoding("UTF-8") rescue "UTF-8 ERROR!"
     end
 
     # if the list of most recently registered users includes the user in question, add
@@ -130,9 +129,23 @@ def kill_spam(ar)
 
     # scan the text of a post for links, then determine if they're appropriate links for this site
     @botkilla.get(@uri.to_s + h['link']) rescue next
-    h['thread_text'] = @botkilla.page.xpath("//td[@class='tablerow' and @valign='top' and @style='height: 80px; width: 82%']/font[@class='mediumtxt']").text
+    body = @botkilla.page.xpath("//td[@class='tablerow' and @valign='top' and @style='height: 80px; width: 82%']/font[@class='mediumtxt']").first
+    h['thread_text'] = ([body.text] + body.xpath("./a").map {|e| e['href']}).join(' ') # adds linked urls to body text for scanning
+    h['thread_text'] = h['thread_text'].force_encoding("UTF-8").encode("ISO-8859-1").force_encoding("UTF-8") rescue "UTF-8 ERROR!" # try to fix encoding if needed
     domains = h['thread_text'].to_s.scan(/https?:\/\/([\w\.-]+)/).flatten
     verdict = domains.group_by {|d| POPULAR_DOMAINS.include?(d)}
+
+    # number of links to unrecognized domains that were posted
+    if verdict[true].to_a.length < verdict[false].to_a.length
+      h['spam_score'] = h['spam_score'].to_i + 6
+      h['flags'] = h['flags'].to_a + ['linking to an unrecognized domain']
+    end
+
+    # check and see if the same word/words are used way too much
+    if body.scan(/(passport)/i).flatten.length > 50
+      h['spam_score'] = h['spam_score'].to_i + 5
+      h['flags'] = h['flags'].to_a + ['repeating the same word too much']
+    end
 
     # checks to see if user is creating a poll for first post, or is submitting a link for first post
     posts = @botkilla.page.xpath("//div[@class='smalltxt']").text[/(?<=Posts: )\d+/].to_i
@@ -144,14 +157,8 @@ def kill_spam(ar)
       h['flags'] = h['flags'].to_a + ['first post ever']
     end
 
-    # number of links to unrecognized domains that were posted
-    if verdict[true].to_a.length < verdict[false].to_a.length
-      h['spam_score'] = h['spam_score'].to_i + 6
-      h['flags'] = h['flags'].to_a + ['linking to an unrecognized domain']
-    end
-
-    # 
-    if h['spam_score'].to_i > 8 && h['tid'] > @tid_cutoff
+    # delete if cumulative spam score is 10 or more
+    if h['spam_score'].to_i >= 10 && h['tid'] > @tid_cutoff
       @last_error = ""
       puts "\n\n"
       puts h.to_yaml
