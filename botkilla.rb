@@ -94,7 +94,7 @@ def delete_thread(h)
     puts "Deleted thread with title \e[1m'#{h['title']}'\e[0m at \e[1m#{Time.now.ctime}\e[0m because \e[1m#{h['flags'].join(', ')}\e[0m."
     @kill_count += 1
     run_time = Time.now - @start_time
-    puts "Killed #{@kill_count} spam posts in #{(run_time/3600).to_i} hours and #{((run_time % 3600)/60).to_i} minutes. (#{(@kill_count*3600)/run_time} kills/hour)"
+    puts "Killed #{@kill_count} spam posts in #{(run_time/3600).to_i} hours and #{((run_time % 3600)/60).to_i} minutes. (#{((@kill_count*3600)/run_time).round(2)} kills/hour)"
   rescue => e
     puts e
   end
