@@ -142,7 +142,7 @@ def kill_spam(ar)
     end
 
     # check and see if the same word/words are used way too much
-    if body.scan(/(passport)/i).flatten.length > 50
+    if h['thread_text'].scan(/(passport)/i).flatten.length > 50
       h['spam_score'] = h['spam_score'].to_i + 5
       h['flags'] = h['flags'].to_a + ['repeating the same word too much']
     end
