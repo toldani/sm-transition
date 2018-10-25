@@ -152,10 +152,10 @@ module BK
       h['flags'] = h['flags'].to_a + ['linking to an unrecognized domain']
     end
 
-    # check and see if the same word/words are used way too much, or if there's any content at all
-    if h['thread_text'].scan(/(passport)/i).flatten.length > 40
+    # check and see if spammy phrases/words are used too much, or if there's any content at all
+    if h['thread_text'].scan(/(fake ?passport)/i).length > 0
       h['spam_score'] = h['spam_score'].to_i + 5
-      h['flags'] = h['flags'].to_a + ['repeating the same word too much']
+      h['flags'] = h['flags'].to_a + ['spam phrase in text']
     elsif h['thread_text'][/\w/].nil? # no letters or numbers in the entire post
       h['spam_score'] = h['spam_score'].to_i + 5
       h['flags'] = h['flags'].to_a + ['content-free post']
