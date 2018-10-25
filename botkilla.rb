@@ -58,6 +58,7 @@ module BK
       begin
         # pull link and title out of the nested Nokogiri mess
         title_cell = tr.at_xpath("./td[@width='43%']/font/a")
+        next if title_cell.nil?
         h['link'] = title_cell['href']
         h['title'] = title_cell.text.force_encoding("UTF-8").encode("ISO-8859-1").force_encoding("UTF-8")
         h['username'] = tr.at_xpath("./td[@width='14%' and @bgcolor='#fffbe8']").text
@@ -137,8 +138,9 @@ module BK
 
     # scan the text of a post for links, then determine if they're appropriate links for this site
     $botkilla.get($uri.to_s + h['link']) # rescue return h
-    body = $botkilla.page.xpath("//td[@class='tablerow' and @valign='top' and @style='height: 80px; width: 82%']/font[@class='mediumtxt']").first
+    body = $botkilla.page.at_xpath("//td[@class='tablerow' and @valign='top' and @style='height: 80px; width: 82%']/font[@class='mediumtxt']")
     h['thread_text'] = ([body.text] + body.xpath("./a").map {|e| e['href']}).join(' ') # adds linked urls to body text for scanning
+
     # fix encoding glitches between ISO-8859-1 and UTF-8
     h['thread_text'] = h['thread_text'].force_encoding("UTF-8").encode("ISO-8859-1").force_encoding("UTF-8") # rescue puts "UTF-8 ERROR!"
     domains = h['thread_text'].to_s.scan(/https?:\/\/([\w\.-]+)/).flatten
@@ -150,10 +152,13 @@ module BK
       h['flags'] = h['flags'].to_a + ['linking to an unrecognized domain']
     end
 
-    # check and see if the same word/words are used way too much
+    # check and see if the same word/words are used way too much, or if there's any content at all
     if h['thread_text'].scan(/(passport)/i).flatten.length > 40
       h['spam_score'] = h['spam_score'].to_i + 5
       h['flags'] = h['flags'].to_a + ['repeating the same word too much']
+    elsif h['thread_text'][/\w/].nil? # no letters or numbers in the entire post
+      h['spam_score'] = h['spam_score'].to_i + 5
+      h['flags'] = h['flags'].to_a + ['content-free post']
     end
 
     # checks to see if user is creating a poll for first post, or is submitting a link for first post
