@@ -158,7 +158,7 @@ module BK
     h['thread_text'] += links
 
     # extract URL domains, then group domains by whether they appear on the internal whitelist
-    domains = h['thread_text'].encode("UTF-8").scan(/https?:\/\/([\w\.-]+)/).flatten
+    domains = h['thread_text'].scrub.scan(/https?:\/\/([\w\.-]+)/).flatten
     verdict = domains.group_by {|d| POPULAR_DOMAINS.include?(d)}
 
     # number of links to unrecognized domains that were posted
