@@ -4,11 +4,14 @@ require 'open-uri'
 require 'yaml'
 
 START_THREAD_CUTOFF = 99000
+
+# sciencemadness domain whitelist, built from forum links posted between 2002 and 2016
 POPULAR_DOMAINS = open("sm-linked-domains.txt").read.split("\n")
 
 #$log = Logger.new "/home/tom/workspace/mechlog.txt"
 #$log.level = Logger::DEBUG
 
+# I don't think I use these methods now that I understand nokogiri better
 class Nokogiri::XML::Element
   def grandchildren
     self.children.children
@@ -21,16 +24,21 @@ end
 
 # putting all these methods in a module, just to make things a bit neater
 module BK
+  # base uri for the forum
   $uri = URI("http://www.sciencemadness.org/talk/")
 
   $tid_cutoff = START_THREAD_CUTOFF
 
+  # request the password on each execution, so it doesn't need to be stored
   $username = "Melgar"
   print "Password: \e[8m"
   $password = gets.chop
+
+  # cute trick to prevent the password from accidentally showing in many common syntaxes
   $password.define_singleton_method(:inspect) { "[REDACTED]" }
   print "\e[0m"
 
+  # create a mechanize agent named 'botkilla' and navigate to the login page
   $botkilla = Mechanize.new # {|a| a.log = $log}
   $botkilla.user_agent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/69.0.3497.81 Chrome/69.0.3497.81 Safari/537.36"
   $botkilla.get("http://www.sciencemadness.org/talk/misc.php?action=login")
@@ -43,9 +51,9 @@ module BK
   $start_time = Time.now
   $users_updated = Time.at(0)
 
+  # enter username and password into form, then log in
   $login_form.field_with(:name => "username").value = $username
   $login_form.field_with(:name => "password").value = $password
-
   $login_form.click_button
 
   # parse the "today's posts" page
@@ -53,10 +61,11 @@ module BK
     $botkilla.get($uri.to_s + "today.php")
     ar = []
 
+    # get HTML elements that are rows with class 'tablerow'
     $botkilla.page.xpath("//tr[@class='tablerow']").each do |tr|
       h = {}
       begin
-        # pull link and title out of the nested Nokogiri mess
+        # pull link, title, username, etc. out of the nested Nokogiri mess
         title_cell = tr.at_xpath("./td[@width='43%']/font/a")
         next if title_cell.nil?
         h['link'] = title_cell['href']
@@ -85,6 +94,7 @@ module BK
     return BK.posts_today.select {|h| h['tid'] > $tid_cutoff}
   end
 
+  # refresh list of most recently registered users
   def self.update_users
     $botkilla.get($uri.to_s + "misc.php?action=list&desc=desc")
     rows = $botkilla.page.search("tr")
@@ -94,6 +104,7 @@ module BK
     $users_updated = Time.now
   end
 
+  # use moderator tools to delete a thread
   def self.delete_thread(h)
     begin
       $botkilla.get("http://www.sciencemadness.org/talk/topicadmin.php?tid=#{h['tid']}&action=delete")
@@ -143,6 +154,8 @@ module BK
 
     # fix encoding glitches between ISO-8859-1 and UTF-8
     h['thread_text'] = h['thread_text'].force_encoding("UTF-8").encode("ISO-8859-1").force_encoding("UTF-8") # rescue puts "UTF-8 ERROR!"
+
+    # extract URL domains, then group domains by whether they appear on the internal whitelist
     domains = h['thread_text'].to_s.scan(/https?:\/\/([\w\.-]+)/).flatten
     verdict = domains.group_by {|d| POPULAR_DOMAINS.include?(d)}
 
@@ -152,7 +165,7 @@ module BK
       h['flags'] = h['flags'].to_a + ['linking to an unrecognized domain']
     end
 
-    # check and see if spammy phrases/words are used too much, or if there's any content at all
+    # check and see if spammy phrases/words are used in the post text, or if there's any content at all
     if h['thread_text'].scan(/(fake ?passport)/i).length > 0
       h['spam_score'] = h['spam_score'].to_i + 5
       h['flags'] = h['flags'].to_a + ['spam phrase in text']
@@ -174,7 +187,7 @@ module BK
     return h
   end
 
-  # run this every time you want to check for spam
+  # run this every time you want to check for spam, on a continuous loop to check continuously
   def self.kill_spam
     # refresh list of new users and list of new posts
     BK.update_users
@@ -184,6 +197,7 @@ module BK
     ar.each do |h|
       next if $checked_threads.include?(h['tid'])
 
+      # calculate a bunch of spam-related stats for a thread
       h = BK.investigate_thread(h)
 
       # delete if cumulative spam score is 10 or more
