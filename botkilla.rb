@@ -168,7 +168,7 @@ module BK
     end
 
     # check and see if spammy phrases/words are used in the post text, or if there's any content at all
-    if h['thread_text'].scan(/(fake ?passport)/i).length > 0
+    if h['thread_text'].scrub.scan(/(fake ?passport)/i).length > 0
       h['spam_score'] = h['spam_score'].to_i + 5
       h['flags'] = h['flags'].to_a + ['spam phrase in text']
     elsif h['thread_text'][/\w/].nil? # no letters or numbers in the entire post
