@@ -150,10 +150,12 @@ module BK
     # scan the text of a post for links, then determine if they're appropriate links for this site
     $botkilla.get($uri.to_s + h['link']) # rescue return h
     body = $botkilla.page.at_xpath("//td[@class='tablerow' and @valign='top' and @style='height: 80px; width: 82%']/font[@class='mediumtxt']")
-    h['thread_text'] = ([body.text] + body.xpath("./a").map {|e| e['href']}).join(' ') # adds linked urls to body text for scanning
+    h['thread_text'] = body.text
+    links = body.xpath("./a").map {|e| e['href']}.join(' ') # adds linked urls to body text for scanning
 
     # fix encoding glitches between ISO-8859-1 and UTF-8
     h['thread_text'] = h['thread_text'].force_encoding("UTF-8").encode("ISO-8859-1").force_encoding("UTF-8") # rescue puts "UTF-8 ERROR!"
+    h['thread_text'] += links
 
     # extract URL domains, then group domains by whether they appear on the internal whitelist
     domains = h['thread_text'].to_s.scan(/https?:\/\/([\w\.-]+)/).flatten
