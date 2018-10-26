@@ -154,11 +154,11 @@ module BK
     links = body.xpath("./a").map {|e| e['href']}.join(' ') # adds linked urls to body text for scanning
 
     # fix encoding glitches between ISO-8859-1 and UTF-8
-    h['thread_text'] = h['thread_text'].force_encoding("UTF-8").encode("ISO-8859-1").force_encoding("UTF-8") # rescue puts "UTF-8 ERROR!"
+    h['thread_text'] = h['thread_text'].force_encoding("UTF-8").encode("ISO-8859-1").force_encoding("UTF-8").scrub # rescue puts "UTF-8 ERROR!"
     h['thread_text'] += links
 
     # extract URL domains, then group domains by whether they appear on the internal whitelist
-    domains = h['thread_text'].scrub.scan(/https?:\/\/([\w\.-]+)/).flatten
+    domains = h['thread_text'].scan(/https?:\/\/([\w\.-]+)/).flatten
     verdict = domains.group_by {|d| POPULAR_DOMAINS.include?(d)}
 
     # number of links to unrecognized domains that were posted
@@ -168,7 +168,7 @@ module BK
     end
 
     # check and see if spammy phrases/words are used in the post text, or if there's any content at all
-    if h['thread_text'].scrub.scan(/(fake ?passport)/i).length > 0
+    if h['thread_text'].scan(/(fake ?passport)/i).length > 0
       h['spam_score'] = h['spam_score'].to_i + 5
       h['flags'] = h['flags'].to_a + ['spam phrase in text']
     elsif h['thread_text'][/\w/].nil? # no letters or numbers in the entire post
