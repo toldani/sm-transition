@@ -102,6 +102,9 @@ module BK
     $users.map! {|a| [a[0], {"reg_date" => DateTime.strptime(a[1], '%m/%d/%y').to_time, "post_count" => a[2].to_i}]}
     $users = $users.to_h
     $users_updated = Time.now
+
+    # maps the users on "today's posts" with how many posts they have on that page
+    $recent_post_count = $users.map {|u| u['username']}.inject({}) {|h,v| h.merge(v => h[v].to_i + 1)}
   end
 
   # use moderator tools to delete a thread
@@ -145,6 +148,12 @@ module BK
         h['spam_score'] = h['spam_score'].to_i + 3
         h['flags'] = h['flags'].to_a + ['registered recently']
       end
+    end
+
+    # if the user has posted unusually frequently
+    if $recent_post_count[h['username']] > 5
+      h['spam_score'] = h['spam_score'].to_i + 4
+      h['flags'] = h['flags'].to_a + ['flood-posting']
     end
 
     # scan the text of a post for links, then determine if they're appropriate links for this site
