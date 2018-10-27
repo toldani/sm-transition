@@ -133,6 +133,7 @@ module BK
       %w(Cyrillic Han Thai Arabic Tagalog).each do |charset|
         if h['title'][/\p{#{charset}}/]
           h['spam_score'] = h['spam_score'].to_i + 3
+          h['spam_score'] += 3 if h['title'].scan(/p{#{charset}}/i).length > h['title'].scan(/[a-z]/i).length
           h['flags'] = h['flags'].to_a + ["#{charset} characters in title"]
           break
         end
