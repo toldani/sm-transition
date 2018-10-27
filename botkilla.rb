@@ -69,7 +69,7 @@ module BK
         title_cell = tr.at_xpath("./td[@width='43%']/font/a")
         next if title_cell.nil?
         h['link'] = title_cell['href']
-        h['title'] = title_cell.text.force_encoding("UTF-8").encode("ISO-8859-1").force_encoding("UTF-8")
+        h['title'] = title_cell.text.force_encoding("UTF-8").encode("ISO-8859-1").force_encoding("UTF-8").scrub
         h['username'] = tr.at_xpath("./td[@width='14%' and @bgcolor='#fffbe8']").text
         h['replies'] = tr.xpath("./td[@width='5%']/font").text.to_i
         h['last_poster'] = tr.at_xpath("./td[@width='23%']/table/tr/td/font/a").text
