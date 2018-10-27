@@ -104,7 +104,8 @@ module BK
     $users_updated = Time.now
 
     # maps the users on "today's posts" with how many posts they have on that page
-    $recent_post_count = $users.map {|u| u['username']}.inject({}) {|h,v| h.merge(v => h[v].to_i + 1)}
+    ulist = BK.new_posts.map {|u| u['username']}
+    $recent_post_count = ulist.inject({}) {|h,v| h.merge(v => h[v].to_i + 1)}
   end
 
   # use moderator tools to delete a thread
