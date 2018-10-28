@@ -153,7 +153,7 @@ module BK
     end
 
     # if the user has posted unusually frequently
-    if $recent_post_count[h['username']] > 5
+    if $recent_post_count[h['username']].to_i > 5
       h['spam_score'] = h['spam_score'].to_i + 4
       h['flags'] = h['flags'].to_a + ['flood-posting']
     end
