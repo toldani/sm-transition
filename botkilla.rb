@@ -129,15 +129,6 @@ module BK
     if h['title'][/(sex|passionate|adult|galleries|unencumbered|mature|callow|casino|passports)/i]
       h['spam_score'] = h['spam_score'].to_i + 3
       h['flags'] = h['flags'].to_a + ['spam words in title']
-    else
-      %w(Cyrillic Han Thai Arabic Tagalog).each do |charset|
-        if h['title'][/\p{#{charset}}/]
-          h['spam_score'] = h['spam_score'].to_i + 3
-          h['spam_score'] += 3 if h['title'].scan(/p{#{charset}}/i).length > h['title'].scan(/[a-z]/i).length
-          h['flags'] = h['flags'].to_a + ["#{charset} characters in title"]
-          break
-        end
-      end
     end
 
     # if the list of most recently registered users includes the user in question, add
@@ -185,6 +176,19 @@ module BK
     elsif h['thread_text'][/\w/].nil? # no letters or numbers in the entire post
       h['spam_score'] = h['spam_score'].to_i + 5
       h['flags'] = h['flags'].to_a + ['content-free post']
+    end
+
+    # check for strange character sets in the title and body
+    %w(Cyrillic Han Thai Arabic Tagalog).each do |charset|
+      if h['title'][/\p{#{charset}}/]
+        h['spam_score'] = h['spam_score'].to_i + 3
+        h['flags'] = h['flags'].to_a + ["#{charset} characters in title"]
+        if h['thread_text'].scan(/\p{#{charset}}/i).length > h['thread_text'].scan(/[a-z]/i).length
+          h['spam_score'] += 4
+          h['flags'] = h['flags'].to_a + ["#{charset} characters in the body"]
+        end
+        break
+      end
     end
 
     # checks to see if user is creating a poll for first post, or is submitting a link for first post
