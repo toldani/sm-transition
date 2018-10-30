@@ -57,7 +57,7 @@ module BK
   $login_form.click_button
 
   # parse the "today's posts" page
-  def self.posts_today
+  def self.new_posts
     $botkilla.get($uri.to_s + "today.php")
     ar = []
 
@@ -86,12 +86,12 @@ module BK
       ar << h
     end
 
-    return ar
+    return ar.select {|h| h['tid'] > $tid_cutoff}
   end
 
   # new posts since posts were last checked
   def self.new_posts
-    return BK.posts_today.select {|h| h['tid'] > $tid_cutoff}
+    
   end
 
   # refresh list of most recently registered users
@@ -170,7 +170,7 @@ module BK
     end
 
     # check and see if spammy phrases/words are used in the post text, or if there's any content at all
-    if h['thread_text'].scan(/(fake ?passport)/i).length > 0
+    if h['thread_text'].scan(/(fake ?passport|lolita)/i).length > 0
       h['spam_score'] = h['spam_score'].to_i + 5
       h['flags'] = h['flags'].to_a + ['spam phrase in text']
     elsif h['thread_text'][/\w/].nil? # no letters or numbers in the entire post
