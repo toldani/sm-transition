@@ -230,5 +230,3 @@ module BK
     end
   end
 end
-
-BK.update_users
