@@ -89,11 +89,6 @@ module BK
     return ar.select {|h| h['tid'] > $tid_cutoff}
   end
 
-  # new posts since posts were last checked
-  def self.new_posts
-    
-  end
-
   # refresh list of most recently registered users
   def self.update_users
     $botkilla.get($uri.to_s + "misc.php?action=list&desc=desc")
