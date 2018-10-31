@@ -74,7 +74,7 @@ module BK
         h['replies'] = tr.xpath("./td[@width='5%']/font").text.to_i
         h['last_poster'] = tr.at_xpath("./td[@width='23%']/table/tr/td/font/a").text
         h['tid'] = h['link'][/(?<=tid=)\d+/].to_i
-      rescue => e
+      rescue => e 
         if $last_error == e.to_s
           print "."
         else
@@ -160,7 +160,7 @@ module BK
 
     # number of links to unrecognized domains that were posted
     if verdict[false].to_a.length > 0
-      h['spam_score'] = h['spam_score'].to_i + 6
+      h['spam_score'] = h['spam_score'].to_i + 7
       h['flags'] = h['flags'].to_a + ['linking to an unrecognized domain']
     end
 
