@@ -25,3 +25,9 @@ Mechanize::Cookie.parse(l, "Set-Cookie: xmblva=1539064941; expires=Wed, 09-Oct-2
 Mechanize::Cookie.parse(l, "Set-Cookie: xmblvb=1539057183; expires=Tue, 09-Oct-2018 06:12:21 GMT; Max-Age=600; path=/talk/; domain=.sciencemadness.org; httponly")
 Mechanize::Cookie.parse(l, "Set-Cookie: xmbuser=Melgar; expires=Thu, 08-Nov-2018 06:02:21 GMT; Max-Age=2592000; path=/talk/; domain=.sciencemadness.org; httponly")
 Mechanize::Cookie.parse(l, "Set-Cookie: xmbpw=7da663d74b0e900bb5e7dfee120a789c; expires=Thu, 08-Nov-2018 06:02:21 GMT; Max-Age=2592000; path=/talk/; domain=.sciencemadness.org; httponly")
+
+https://pubchem.ncbi.nlm.nih.gov/image/imagefly.cgi?cid=9566063&width=250&height=250
+
+TeX: {
+  extensions: ["mhchem.js"]
+}

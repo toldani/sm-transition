@@ -1,4 +1,10 @@
-# 
+# To parse bbcode, whole threads will be loaded into memory and parsed at once.  This not only reduces
+# SQL calls, but it allows posts within a thread to reference each other without needing to pull any
+# additional data from the DB.  
+#
+# Steps:
+# 1. Scan for escaped HTML and replace with equivalent bbcode
+# 2. 
 
 BBCODE_MAP =  {
   "Bold"=>
