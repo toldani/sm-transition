@@ -38,7 +38,7 @@ module BK
   
   loop do
     pw << STDIN.getch
-    if pw[-1] == "\u003"
+    if pw[-1] == "\u0003"
       puts "Password input cleared, starting over."
       pw = ''
     elsif pw[-1] == "\r"
