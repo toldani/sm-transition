@@ -2,6 +2,7 @@ require 'mechanize'
 #require 'logger'
 require 'open-uri'
 require 'yaml'
+require 'io/console'
 
 START_THREAD_CUTOFF = 99000
 
@@ -30,13 +31,23 @@ module BK
   $tid_cutoff = START_THREAD_CUTOFF
 
   # request the password on each execution, so it doesn't need to be stored
-  $username = "Melgar"
-  print "Password: \e[8m"
-  $password = gets.chop
+  user = "Melgar"
+  print "Password: "
 
-  # cute trick to prevent the password from accidentally showing in many common syntaxes
-  $password.define_singleton_method(:inspect) { "[REDACTED]" }
-  print "\e[0m"
+  pw = ''
+  
+  loop do
+    pw << STDIN.getch
+    if pw[-1] == "\u003"
+      puts "Password input cleared, starting over."
+      pw = ''
+    elsif pw[-1] == "\r"
+      pw = pw.chop
+      break
+    end
+  end
+
+  $password = pw
 
   # create a mechanize agent named 'botkilla' and navigate to the login page
   $botkilla = Mechanize.new # {|a| a.log = $log}
@@ -52,9 +63,11 @@ module BK
   $users_updated = Time.at(0)
 
   # enter username and password into form, then log in
-  $login_form.field_with(:name => "username").value = $username
-  $login_form.field_with(:name => "password").value = $password
+  $login_form.field_with(:name => "username").value = user
+  $login_form.field_with(:name => "password").value = pw
   $login_form.click_button
+
+  pw = ''
 
   # parse the "today's posts" page
   def self.new_posts
@@ -131,13 +144,13 @@ module BK
     end
 
     # if the list of most recently registered users includes the user in question, add
-    # 5 points for registereing in the last 36 hours, 3 points oherwise.
+    # 5 points for registereing in the last 36 hours, 2 points oherwise.
     if $users.keys.include? h['username']
       if (Time.now - $users[h['username']]['reg_date']) / 3600 < 36 
         h['spam_score'] = h['spam_score'].to_i + 5
         h['flags'] = h['flags'].to_a + ['registered since yesterday']
       else
-        h['spam_score'] = h['spam_score'].to_i + 3
+        h['spam_score'] = h['spam_score'].to_i + 2
         h['flags'] = h['flags'].to_a + ['registered recently']
       end
     end
@@ -164,7 +177,7 @@ module BK
 
     # number of links to unrecognized domains that were posted
     if verdict[false].to_a.length > 0
-      h['spam_score'] = h['spam_score'].to_i + 7
+      h['spam_score'] = h['spam_score'].to_i + 5
       h['flags'] = h['flags'].to_a + ['linking to an unrecognized domain']
     end
 
