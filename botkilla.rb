@@ -34,6 +34,7 @@ module BK
   user = "Melgar"
   print "Password: "
 
+  # password is no longer saved, and should not show up in any logs ever
   pw = ''
   
   loop do
@@ -46,8 +47,6 @@ module BK
       break
     end
   end
-
-  $password = pw
 
   # create a mechanize agent named 'botkilla' and navigate to the login page
   $botkilla = Mechanize.new # {|a| a.log = $log}
