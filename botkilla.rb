@@ -133,7 +133,7 @@ module BK
   # get a bunch more background info on a particular thread
   def self.investigate_thread(h)
     # If the title contains words common in spam titles
-    if h['title'][/(sex|passionate|adult|galleries|unencumbered|mature|callow|casino|passports|\p{^ASCII})/i]
+    if h['title'][/(sex|passionate|adult|galleries|unencumbered|mature|callow|casino|jerseys|passports|\p{^ASCII})/i]
       h['spam_score'] = h['spam_score'].to_i + 4
       if h['title'][/\p{^ASCII}/]
         h['flags'] = h['flags'].to_a + ['non-ASCII characters in title']
