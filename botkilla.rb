@@ -133,7 +133,7 @@ module BK
   # get a bunch more background info on a particular thread
   def self.investigate_thread(h)
     # If the title contains words common in spam titles
-    if h['title'][/(sex|passionate|adult|galleries|unencumbered|mature|callow|casino|jerseys|passports|\p{^ASCII})/i]
+    if h['title'][/(sex|passionate|adult|galleries|unencumbered|mature|viagra|cialis|callow|casino|jerseys|passports|\p{^ASCII})/i]
       h['spam_score'] = h['spam_score'].to_i + 4
       if h['title'][/\p{^ASCII}/]
         h['flags'] = h['flags'].to_a + ['non-ASCII characters in title']
@@ -181,7 +181,7 @@ module BK
     end
 
     # check and see if spammy phrases/words are used in the post text, or if there's any content at all
-    if h['thread_text'].scan(/(fake ?passport|lolita)/i).length > 0
+    if h['thread_text'].scan(/(fake ?passport|lolita|viagra|cialis)/i).length > 0
       h['spam_score'] = h['spam_score'].to_i + 5
       h['flags'] = h['flags'].to_a + ['spam phrase in text']
     elsif h['thread_text'][/\w/].nil? # no letters or numbers in the entire post
