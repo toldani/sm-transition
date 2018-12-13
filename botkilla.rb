@@ -4,7 +4,7 @@ require 'open-uri'
 require 'yaml'
 require 'io/console'
 
-START_THREAD_CUTOFF = 99000
+START_THREAD_CUTOFF = 112000
 
 # sciencemadness domain whitelist, built from forum links posted between 2002 and 2016
 POPULAR_DOMAINS = open("sm-linked-domains.txt").read.split("\n")
