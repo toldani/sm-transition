@@ -123,6 +123,8 @@ module BK
       puts "Deleted thread with title \e[1;37m'#{h['title']}'\e[0m at \e[1;37m#{Time.now.ctime}\e[0m because \e[1;37m#{h['flags'].join(', ')}\e[0m."
       $kill_count += 1
       run_time = Time.now - $start_time
+      new_cutoff = h['tid'].to_i - 20
+      $tid_cutoff = new_cutoff if new_cutoff > $tid_cutoff # increment $tid_cutoff
       puts "\n\n"
       puts "\e[1;32mKilled #{$kill_count} spam posts in #{(run_time/3600).to_i} hours and #{((run_time % 3600)/60).to_i} minutes. (#{(($kill_count*3600)/run_time).round(2)} kills/hour)\e[0m"
     rescue => e
