@@ -176,7 +176,7 @@ module BK
 
     # number of links to unrecognized domains that were posted
     if verdict[false].to_a.length > 0
-      h['spam_score'] = h['spam_score'].to_i + 2 + (verdict[false].length * 3)
+      h['spam_score'] = h['spam_score'].to_i + 5
       h['flags'] = h['flags'].to_a + ['linking to an unrecognized domain']
     end
 
