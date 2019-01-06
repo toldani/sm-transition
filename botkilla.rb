@@ -4,7 +4,7 @@ require 'open-uri'
 require 'yaml'
 require 'io/console'
 
-START_THREAD_CUTOFF = 112000
+START_THREAD_CUTOFF = 120000
 
 # sciencemadness domain whitelist, built from forum links posted between 2002 and 2016
 POPULAR_DOMAINS = open("sm-linked-domains.txt").read.split("\n")
@@ -83,7 +83,7 @@ module BK
         h['link'] = title_cell['href']
         h['title'] = title_cell.text.force_encoding("UTF-8").encode("ISO-8859-1", invalid: :replace, undef: :replace, replace: '').force_encoding("UTF-8").scrub
         h['username'] = tr.at_xpath("./td[@width='14%' and @bgcolor='#fffbe8']").text
-        h['replies'] = tr.xpath("./td[@width='5%']/font").text.to_i
+        h['replies'] = tr.xpath("./td[@width='5%' and @bgcolor='#fffbe8']/font").text.to_i
         h['last_poster'] = tr.at_xpath("./td[@width='23%']/table/tr/td/font/a").text
         h['tid'] = h['link'][/(?<=tid=)\d+/].to_i
       rescue => e 
@@ -123,7 +123,7 @@ module BK
       puts "Deleted thread with title \e[1;37m'#{h['title']}'\e[0m at \e[1;37m#{Time.now.ctime}\e[0m because \e[1;37m#{h['flags'].join(', ')}\e[0m."
       $kill_count += 1
       run_time = Time.now - $start_time
-      new_cutoff = h['tid'].to_i - 20
+      new_cutoff = h['tid'].to_i - 100
       $tid_cutoff = new_cutoff if new_cutoff > $tid_cutoff # increment $tid_cutoff
       puts "\n\n"
       puts "\e[1;32mKilled #{$kill_count} spam posts in #{(run_time/3600).to_i} hours and #{((run_time % 3600)/60).to_i} minutes. (#{(($kill_count*3600)/run_time).round(2)} kills/hour)\e[0m"
@@ -135,7 +135,7 @@ module BK
   # get a bunch more background info on a particular thread
   def self.investigate_thread(h)
     # If the title contains words common in spam titles
-    if h['title'][/(sex|passionate|adult|galleries|unencumbered|mature|viagra|cialis|callow|casino|jerseys|passports|\p{^ASCII})/i]
+    if h['title'][/(sex|passionate|adult|porn|galleries|unencumbered|mature|viagra|cialis|callow|teen|casino|jerseys|passports|\p{^ASCII})/i]
       h['spam_score'] = h['spam_score'].to_i + 4
       if h['title'][/\p{^ASCII}/]
         h['flags'] = h['flags'].to_a + ['non-ASCII characters in title']
